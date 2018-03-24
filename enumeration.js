@@ -135,19 +135,19 @@
 
 
 // moveUp : function () {
-//     this.currentMapCell.y--;
+//     this.currentMapCell.yIndex--;
 // },
 //
 // moveDown : function() {
-//     this.currentMapCell.y++;
+//     this.currentMapCell.yIndex++;
 // },
 //
 // moveLeft : function () {
-//     this.currentMapCell.x--;
+//     this.currentMapCell.xIndex--;
 // },
 //
 // moveRight : function () {
-//     this.currentMapCell.x++;
+//     this.currentMapCell.xIndex++;
 // },
 //
 // moveUpRight: function () {

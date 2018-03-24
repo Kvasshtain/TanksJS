@@ -48,19 +48,63 @@ Object.freeze(direction);
 
 //=====================================================================
 
-function MapCell(x, y) {
-    if (!isInteger(x))
-        throw TypeError("x is not int");
+function MapCell(xIndex, yIndex) {
+    if (!isInteger(xIndex))
+        throw TypeError("xIndex is not int");
 
-    if (!isInteger(y))
-        throw TypeError("y is not int");
+    if (!isInteger(yIndex))
+        throw TypeError("yIndex is not int");
 
-    this.x = x;
-    this.y = y;
+    this.xIndex = xIndex;
+    this.yIndex = yIndex;
 }
 
 MapCell.prototype = {
-    constructor : MapCell
+    constructor : MapCell,
+
+    identifyDirectionToNextCell : function (nextCell) {
+        if (!(nextCell instanceof MapCell))
+            throw TypeError("nextCell is not MapCell");
+
+        if ((this.xIndex > nextCell.xIndex) && (this.yIndex > nextCell.yIndex))
+            return "upLeft";
+
+        if ((this.xIndex == nextCell.xIndex) && (this.yIndex > nextCell.yIndex))
+            return "up";
+
+        if ((this.xIndex < nextCell.xIndex) && (this.yIndex > nextCell.yIndex))
+            return "upRight";
+
+        if ((this.xIndex < nextCell.xIndex) && (this.yIndex == nextCell.yIndex))
+            return "right";
+
+        if ((this.xIndex < nextCell.xIndex) && (this.yIndex < nextCell.yIndex))
+            return "downRight";
+
+        if ((this.xIndex == nextCell.xIndex) && (this.yIndex < nextCell.yIndex))
+            return "down";
+
+        if ((this.xIndex > nextCell.xIndex) && (this.yIndex < nextCell.yIndex))
+            return "downLeft";
+
+        if ((this.xIndex > nextCell.xIndex) && (this.yIndex == nextCell.yIndex))
+            return "left";
+    }
+}
+
+MapCell.areEqual = function (firstCell, secondCell) {
+
+    if (!firstCell instanceof MapCell)
+        throw new TypeError("firstCell is not MapCell");
+
+    if (!secondCell instanceof MapCell)
+        throw new TypeError("secondCell is not MapCell");
+
+    if ((firstCell.xIndex == secondCell.xIndex) && (firstCell.yIndex == secondCell.yIndex)){
+        return true;
+    }
+
+    return false;
 }
 
 //=====================================================================
@@ -147,16 +191,16 @@ BattleMap.prototype ={
         if (!(mapCell instanceof MapCell))
             throw TypeError("This is not MapCell");
 
-        if (mapCell.x < 0)
+        if (mapCell.xIndex < 0)
             return false;
 
-        if (mapCell.y < 0)
+        if (mapCell.yIndex < 0)
             return false;
 
-        if (mapCell.x >= this.columnNum)
+        if (mapCell.xIndex >= this.columnNum)
             return false;
 
-        if (mapCell.y >= this.rowNum)
+        if (mapCell.yIndex >= this.rowNum)
             return false;
 
         return true;
@@ -178,6 +222,12 @@ function GameDrawer(cellWidth, cellHeight, battleMap, units) {
 
     if (!(battleMap instanceof BattleMap))
         throw TypeError("This is not BattleMap");
+
+    if (cellWidth === undefined)
+        throw TypeError("cellWidth === undefined");
+
+    if (cellHeight === undefined)
+        throw TypeError("cellHeight === undefined");
 
     if (cellWidth <= 0)
         throw RangeError("cellWidth <= 0");
@@ -253,8 +303,8 @@ GameDrawer.prototype ={
         for(var i = 0; i < this.units.length; i++){
 
             if ((this.units[i].renderingX === undefined) || (this.units[i].renderingY === undefined)) {
-                this.units[i].renderingX = this.cellHeight * this.units[i].currentMapCell.x;
-                this.units[i].renderingY = this.cellWidth * this.units[i].currentMapCell.y;
+                this.units[i].renderingX = this.cellHeight * this.units[i].currentMapCell.xIndex;
+                this.units[i].renderingY = this.cellWidth * this.units[i].currentMapCell.yIndex;
             }
 
             x = this.units[i].renderingX;
@@ -291,52 +341,6 @@ GameDrawer.prototype ={
             this.drawArea.translate(-(x + width/2),-(y + height/2));
             this.drawArea.drawImage(image, x, y, width, height);
             this.drawArea.restore();
-
-            this._animateMovement(i);
-        }
-    },
-
-    _animateMovement : function(i) {
-
-        if ((this.units[i].currentMapCell.x == this.units[i].nextMapCell.x) && (this.units[i].currentMapCell.y == this.units[i].nextMapCell.y))
-            return;
-
-        orientation = this.units[i].orientation;
-
-        switch (orientation) {
-            case "up":
-                this.units[i].renderingY--;
-                break;
-            case "down":
-                this.units[i].renderingY++;
-                break;
-            case "left":
-                this.units[i].renderingX--;
-                break;
-            case "right":
-                this.units[i].renderingX++;
-                break;
-            case "upRight":
-                this.units[i].renderingX++;
-                this.units[i].renderingY--;
-                break;
-            case "downRight":
-                this.units[i].renderingX++;
-                this.units[i].renderingY++;
-                break;
-            case "downLeft":
-                this.units[i].renderingX--;
-                this.units[i].renderingY++;
-                break;
-            case "upLeft":
-                this.units[i].renderingX--;
-                this.units[i].renderingY--;
-                break;
-        }
-
-        if ((this.cellHeight * this.units[i].nextMapCell.x == this.units[i].renderingX) && (this.cellHeight * this.units[i].nextMapCell.y == this.units[i].renderingY)){
-            this.units[i].currentMapCell.x = this.units[i].nextMapCell.x;
-            this.units[i].currentMapCell.y = this.units[i].nextMapCell.y
         }
     }
 }
@@ -359,20 +363,20 @@ PathFinder.prototype = {
     constructor : PathFinder,
 
     _calcDistance : function (startCell, destinationCell) {
-        return Math.abs(destinationCell.x - startCell.x) + Math.abs(destinationCell.y - startCell.y);
+        return Math.abs(destinationCell.xIndex - startCell.xIndex) + Math.abs(destinationCell.yIndex - startCell.yIndex);
     },
 
     _findSurroundingCells : function (cell) {
-        var leftX = cell.x - 1,
-            rightX = cell.x + 1,
-            upY = cell.y - 1,
-            downY = cell.y + 1,
+        var leftX = cell.xIndex - 1,
+            rightX = cell.xIndex + 1,
+            upY = cell.yIndex - 1,
+            downY = cell.yIndex + 1,
             currentCell,
             surroundingCells = [];
 
         for (var y = upY; y <= downY; y++) {
             for (var x = leftX; x <= rightX; x++) {
-                if (x == cell.x && y == cell.y) continue;
+                if (x == cell.xIndex && y == cell.yIndex) continue;
                 currentCell = new MapCell(x,y);
                 if (!this.battleMap.isCellInMap(currentCell)) continue;
                 surroundingCells.push(currentCell);
@@ -426,17 +430,8 @@ PathFinder.prototype = {
 
         closeCells.push(currentCell);
 
-        // while ((currentCell.x != destinationCell.x)
-        // || (currentCell.y != destinationCell.y)){
-        //     surroundingCells = this._findSurroundingCells(currentCell);
-        //     this._throwOutObstacles(surroundingCells);
-        //     openCells.push(surroundingCells);
-        //     currentCell = this._findNearestToDestinationCell(surroundingCells, destinationCell);
-        //     closeCells.push(currentCell);
-        // }
-
-        if ((currentCell.x != destinationCell.x)
-        || (currentCell.y != destinationCell.y)){
+        if ((currentCell.xIndex != destinationCell.xIndex)
+        || (currentCell.yIndex != destinationCell.yIndex)){
             surroundingCells = this._findSurroundingCells(currentCell);
             this._throwOutObstacles(surroundingCells);
             openCells.push(surroundingCells);
@@ -450,7 +445,7 @@ PathFinder.prototype = {
 
 //=====================================================================
 
-function UnitsMover(units, pathFinder){
+function UnitsMover(units, pathFinder, cellWidth, cellHeight){
 
     if (!(units instanceof Array) && !(units instanceof Object))
         throw TypeError("This is not Array or Object");
@@ -463,8 +458,22 @@ function UnitsMover(units, pathFinder){
     if (!(pathFinder instanceof PathFinder))
         throw TypeError("This is not PathFinder");
 
+    if (cellWidth === undefined)
+        throw TypeError("cellWidth === undefined");
+
+    if (cellHeight === undefined)
+        throw TypeError("cellHeight === undefined");
+
+    if (cellWidth <= 0)
+        throw RangeError("cellWidth <= 0");
+
+    if (cellHeight <= 0)
+        throw RangeError("cellHeight <= 0");
+
     this.units = units;
     this.pathFinder = pathFinder;
+    this.cellWidth = cellWidth;
+    this.cellHeight = cellHeight;
 }
 
 UnitsMover.prototype = {
@@ -472,34 +481,8 @@ UnitsMover.prototype = {
 
     _turnAndMoveUnit : function(unit, nextCell) {
 
-        if (!(nextCell instanceof MapCell))
-            throw TypeError("nextCell is not MapCell");
+        unit.orientation = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
 
-        if ((unit.currentMapCell.x > nextCell.x) && (unit.currentMapCell.y > nextCell.y))
-            unit.orientation = "upLeft";
-
-        if ((unit.currentMapCell.x == nextCell.x) && (unit.currentMapCell.y > nextCell.y))
-            unit.orientation = "up";
-
-        if ((unit.currentMapCell.x < nextCell.x) && (unit.currentMapCell.y > nextCell.y))
-            unit.orientation = "upRight";
-
-        if ((unit.currentMapCell.x < nextCell.x) && (unit.currentMapCell.y == nextCell.y))
-            unit.orientation = "right";
-
-        if ((unit.currentMapCell.x < nextCell.x) && (unit.currentMapCell.y < nextCell.y))
-            unit.orientation = "downRight";
-
-        if ((unit.currentMapCell.x == nextCell.x) && (unit.currentMapCell.y < nextCell.y))
-            unit.orientation = "down";
-
-        if ((unit.currentMapCell.x > nextCell.x) && (unit.currentMapCell.y < nextCell.y))
-            unit.orientation = "downLeft";
-
-        if ((unit.currentMapCell.x > nextCell.x) && (unit.currentMapCell.y == nextCell.y))
-            unit.orientation = "left";
-
-        //unit.currentMapCell = nextCell;
         unit.nextMapCell = nextCell;
     },
 
@@ -510,11 +493,12 @@ UnitsMover.prototype = {
             var unit = this.units[unitIndex],
                 closeCells;
 
-            if ((unit.currentMapCell.x != unit.nextMapCell.x) || (unit.currentMapCell.y != unit.nextMapCell.y)){
+            if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
                 continue;
             }
 
-            if ((unit.currentMapCell.x == unit.destinationMapCell.x) && (unit.currentMapCell.y == unit.destinationMapCell.y)){
+            if ((unit.currentMapCell.xIndex != unit.nextMapCell.xIndex) || (unit.currentMapCell.yIndex != unit.nextMapCell.yIndex)){
+                this._moveUnitsBetweenCells(unitIndex);
                 continue;
             }
 
@@ -525,12 +509,12 @@ UnitsMover.prototype = {
         }
     },
 
-    _moveUnitsBetweenCells : function () {
+    _moveUnitsBetweenCells : function (i) {
         var orientation;
 
-        if ((this.units[i].currentMapCell.x == this.units[i].nextMapCell.x)
-            && (this.units[i].currentMapCell.y == this.units[i].nextMapCell.y))
+        if (MapCell.areEqual(this.units[i].currentMapCell, this.units[i].nextMapCell)) {
             return;
+        }
 
         orientation = this.units[i].orientation;
 
@@ -565,9 +549,10 @@ UnitsMover.prototype = {
                 break;
         }
 
-        if ((this.cellHeight * this.units[i].nextMapCell.x == this.units[i].renderingX) && (this.cellHeight * this.units[i].nextMapCell.y == this.units[i].renderingY)){
-            this.units[i].currentMapCell.x = this.units[i].nextMapCell.x;
-            this.units[i].currentMapCell.y = this.units[i].nextMapCell.y
+        if ((this.cellWidth * this.units[i].nextMapCell.xIndex == this.units[i].renderingX)
+            && (this.cellHeight * this.units[i].nextMapCell.yIndex == this.units[i].renderingY)){
+            this.units[i].currentMapCell.xIndex = this.units[i].nextMapCell.xIndex;
+            this.units[i].currentMapCell.yIndex = this.units[i].nextMapCell.yIndex
         }
     }
 }
@@ -596,7 +581,8 @@ UnitFinder.prototype = {
             throw TypeError("This is not MapCell");
 
         for (var unitIndex = 0; unitIndex < this.units.length; unitIndex++){
-            if (this.units[unitIndex].currentMapCell.x == mapCell.x && this.units[unitIndex].currentMapCell.y == mapCell.y){
+
+            if (MapCell.areEqual(this.units[unitIndex].currentMapCell, mapCell)) {
                 return unitIndex;
             }
         }
@@ -743,7 +729,7 @@ function gameRoutine(){
         gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, units),
         unitFinder = new UnitFinder(units),
         pathFinder = new PathFinder(battleMap, unitFinder),
-        unitsMover = new UnitsMover(units, pathFinder),
+        unitsMover = new UnitsMover(units, pathFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, units, unitFinder, undefined, undefined);
 
     image.src = 'Pz-3.png';
