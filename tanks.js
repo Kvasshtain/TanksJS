@@ -364,10 +364,6 @@ function PathFinder(battleMap, unitFinder) {
 PathFinder.prototype = {
     constructor : PathFinder,
 
-    // _calcDistance : function (startCell, destinationCell) {
-    //     return Math.abs(destinationCell.xIndex - startCell.xIndex) + Math.abs(destinationCell.yIndex - startCell.yIndex);
-    // },
-
     _findSurroundingCells : function (cell) {
         var leftX = cell.xIndex - 1,
             rightX = cell.xIndex + 1,
@@ -408,20 +404,6 @@ PathFinder.prototype = {
         }
     },
 
-    // _findNearestToDestinationCell : function (cells, destinationCell) {
-    //     var minDistance = this._calcDistance(cells[0], destinationCell),
-    //         nearestToDestinationCell = cells[0],
-    //         distance = 0;
-    //     for (var i = 0; i < cells.length; i++){
-    //         distance = this._calcDistance(cells[i], destinationCell);
-    //         if (distance < minDistance){
-    //             minDistance = distance;
-    //             nearestToDestinationCell = cells[i];
-    //         }
-    //     }
-    //     return nearestToDestinationCell;
-    // },
-
     _heuristicFunction : function (firstCell, secondCell) {
         var x = secondCell.xIndex - firstCell.xIndex,
             y = secondCell.yIndex - firstCell.yIndex;
@@ -429,21 +411,7 @@ PathFinder.prototype = {
         //return Math.abs(x) + Math.abs(y);
     },
 
-    // _min1d : function (array1d) {
-    //     return Math.min.apply(Math, array1d);
-    // },
-    //
-    // _min2d : function (array2d) {
-    //     var minimums = [];
-    //
-    //     for(var i = 0; i<array2d.length; i++){
-    //         minimums[i] = this._min1d(array2d[i]);
-    //     }
-    //
-    //     return this._min1d(minimums);
-    // },
-
-    _findCellWithMinCurrentToDestinationWeight : function (currentToDestinationWeights, openCells) {
+    _dequeueCellWithMinPriority : function (currentToDestinationWeights, openCells) {
         var minXIndex,
             minYIndex,
             currentWeights,
@@ -460,27 +428,21 @@ PathFinder.prototype = {
             }
         }
 
-        // for (var i = 0; i < currentToDestinationWeights.length; i++) {
-        //     for (var j = 0; j < currentToDestinationWeights[i].length; j++) {
-        //         if (currentToDestinationWeights[i][j] < min) {
-        //             min = currentToDestinationWeights[i][j];
-        //             minXIndex = i;
-        //             minYIndex = j;
-        //         }
-        //     }
-        // }
-
         openCells.splice(openCellsMinIndex,1);
         return new MapCell(minXIndex, minYIndex);
     },
 
-    // _calcCurrentToDestinationWeight : function (currentCell, destinationCell) {
-    //
-    // },
-    //
-    // _calcCurrentToNextWeight : function (currentCell, nextCell) {
-    //
-    // },
+    _enqueueCell : function (cell, cellArray) {
+        if(cellArray.length == 0){
+            cellArray.push(cell);
+            return;
+        }
+
+        if(MapCell.areEqual(cellArray[cellArray.length - 1],cell))
+            return;
+
+        cellArray.push(cell);
+    },
 
     _removeCertainCellFromArray : function (cells, cell) {
         for(var i = 0; i < cells.length; i++) {
@@ -513,7 +475,11 @@ PathFinder.prototype = {
     },
 
     _findPreviousNeighboringCell : function (cell, cellsArray) {
-        var cellIndex;
+        var cellIndex,
+            resultCell,
+            startCell = cellsArray[0],
+            lastCellCost,
+            currentCellCost;
 
         for(var i = cellsArray.length - 1; i >= 0; i--) {
             if (MapCell.areEqual(cellsArray[i], cell)) {
@@ -522,18 +488,33 @@ PathFinder.prototype = {
             }
         }
 
+        lastCellCost = this._heuristicFunction(cellsArray[cellIndex], startCell);
+
+        for(var i = cellIndex - 1; i >= 0; i--){
+            if ((Math.abs(cellsArray[i].xIndex - cell.xIndex) > 1)
+                || (Math.abs(cellsArray[i].yIndex - cell.yIndex) > 1)) {
+                continue;
+            }
+            resultCell = cellsArray[i];
+            cellIndex = i;
+            break;
+        }
+
         for(var i = cellIndex - 1; i >= 0; i--) {
-            if (MapCell.areEqual(cellsArray[i], cell)) {
+            currentCellCost = this._heuristicFunction(cellsArray[i], startCell);
+
+            if ((Math.abs(cellsArray[i].xIndex - cell.xIndex) > 1)
+                || (Math.abs(cellsArray[i].yIndex - cell.yIndex) > 1)) {
                 continue;
             }
 
-            if ((Math.abs(cellsArray[i].xIndex - cell.xIndex) <= 1)
-               && (Math.abs(cellsArray[i].yIndex - cell.yIndex) <= 1)) {
-                return cellsArray[i];
+            if (lastCellCost >= currentCellCost) {
+                resultCell = cellsArray[i];
+                lastCellCost = currentCellCost;
             }
         }
 
-        return undefined;
+        return resultCell;
     },
 
     _getWayFromCells : function (fromCells) {
@@ -570,59 +551,49 @@ PathFinder.prototype = {
             closeCells = [],
             cameFromCells = [],
             resultWay,
-            startToCurrentWeights = this._createNewArray2dWithMapSize(),
-            currentToDestinationWeights = this._createNewArray2dWithMapSize(),
+            costSoFar = this._createNewArray2dWithMapSize(),
+            priority = this._createNewArray2dWithMapSize(),
             currentCell,
             surroundingCells,
-            tempStartToCurrentWeights,
-            neighboringCell;
+            newCost,
+            next;
 
         openCells.push(startCell);
-        startToCurrentWeights[startCell.xIndex][startCell.yIndex] = 0;
-        currentToDestinationWeights[startCell.xIndex][startCell.yIndex]
-            = startToCurrentWeights[startCell.xIndex][startCell.yIndex] + this._heuristicFunction(startCell, destinationCell);
+        costSoFar[startCell.xIndex][startCell.yIndex] = 0;
+        priority[startCell.xIndex][startCell.yIndex]
+            = costSoFar[startCell.xIndex][startCell.yIndex] + this._heuristicFunction(startCell, destinationCell);
 
         while (openCells.length > 0) {
+            currentCell = this._dequeueCellWithMinPriority(priority, openCells);
 
-            currentCell = this._findCellWithMinCurrentToDestinationWeight(currentToDestinationWeights, openCells);
             if (MapCell.areEqual(currentCell, destinationCell)) {
                 cameFromCells.push(destinationCell);
                 resultWay = this._getWayFromCells(cameFromCells);
                 return resultWay;
             }
+
             this._removeCertainCellFromArray(openCells, currentCell);
-            closeCells.push(currentCell);
+            this._enqueueCell(currentCell, closeCells);
             surroundingCells = this._findSurroundingCells(currentCell);
             this._throwOutObstacles(surroundingCells);
             this._throwOutCloseCells(surroundingCells, closeCells);
+
             for(var i = 0; i < surroundingCells.length; i++) {
-                neighboringCell = surroundingCells[i];
-                tempStartToCurrentWeights = startToCurrentWeights[currentCell.xIndex][currentCell.yIndex] + 1;
-                // 1 - это дорога до соседа
-                if (!this._isCellInOpen(neighboringCell, openCells)
-                    || tempStartToCurrentWeights < startToCurrentWeights[neighboringCell.xIndex][neighboringCell.yIndex]) {
-                    cameFromCells.push(currentCell);
-                    startToCurrentWeights[neighboringCell.xIndex][neighboringCell.yIndex] = tempStartToCurrentWeights;
-                    currentToDestinationWeights[neighboringCell.xIndex][neighboringCell.yIndex] =
-                        tempStartToCurrentWeights + this._heuristicFunction(neighboringCell, destinationCell);
-                    openCells.push(neighboringCell);
+                next = surroundingCells[i];
+                newCost = costSoFar[currentCell.xIndex][currentCell.yIndex] + 1;
+
+                if (!this._isCellInOpen(next, openCells)
+                    || newCost < costSoFar[next.xIndex][next.yIndex]) {
+                    this._enqueueCell(currentCell, cameFromCells);
+                    costSoFar[next.xIndex][next.yIndex] = newCost;
+                    priority[next.xIndex][next.yIndex] =
+                        newCost + this._heuristicFunction(next, destinationCell);
+                    this._enqueueCell(next, openCells);
                 }
-                // if (!this._isCellInOpen(neighboringCell, openCells)) {
-                //     openCells.push(neighboringCell);
-                // }
             }
         }
 
         return undefined;
-
-        // if ((currentCell.xIndex != destinationCell.xIndex)
-        // || (currentCell.yIndex != destinationCell.yIndex)){
-        //     surroundingCells = this._findSurroundingCells(currentCell);
-        //     this._throwOutObstacles(surroundingCells);
-        //     openCells.push(surroundingCells);
-        //     currentCell = this._findNearestToDestinationCell(surroundingCells, destinationCell);
-        //     closeCells.push(currentCell);
-        // }
 
         return closeCells;
     }
@@ -630,7 +601,7 @@ PathFinder.prototype = {
 
 //=====================================================================
 
-function UnitsMover(units, pathFinder, cellWidth, cellHeight){
+function UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight){
 
     if (!(units instanceof Array) && !(units instanceof Object))
         throw TypeError("This is not Array or Object");
@@ -642,6 +613,9 @@ function UnitsMover(units, pathFinder, cellWidth, cellHeight){
 
     if (!(pathFinder instanceof PathFinder))
         throw TypeError("This is not PathFinder");
+
+    if (!(unitFinder instanceof UnitFinder))
+        throw TypeError("This is not UnitFinder");
 
     if (cellWidth === undefined)
         throw TypeError("cellWidth === undefined");
@@ -657,6 +631,7 @@ function UnitsMover(units, pathFinder, cellWidth, cellHeight){
 
     this.units = units;
     this.pathFinder = pathFinder;
+    this.unitFinder = unitFinder;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
 }
@@ -665,6 +640,21 @@ UnitsMover.prototype = {
     constructor : UnitsMover,
 
     _turnAndMoveUnit : function(unit, nextCell) {
+
+        if (MapCell.areEqual(nextCell, unit.destinationMapCell)
+            &&
+            (this.unitFinder.findByCoordinates(nextCell) !== undefined)) {
+            unit.destinationMapCell = unit.currentMapCell;
+            unit.nextMapCell = unit.currentMapCell;
+            unit.movementPathStepIndex = 0;
+            return;
+        }
+
+        if (this.unitFinder.findByCoordinates(nextCell) !== undefined) {
+            unit.movementPath = this.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
+            unit.movementPathStepIndex = 1;
+            nextCell = unit.movementPath[unit.movementPathStepIndex];
+        }
 
         unit.orientation = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
 
@@ -686,10 +676,6 @@ UnitsMover.prototype = {
                 this._moveUnitsBetweenCells(unitIndex);
                 continue;
             }
-
-            // closeCells = this.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
-            // unit.movementPath = closeCells;
-            // unit.movementPathStepIndex = 0;
 
             if (unit.movementPath != undefined) {
                 this._turnAndMoveUnit(unit, unit.movementPath[unit.movementPathStepIndex]);
@@ -773,7 +759,9 @@ UnitFinder.prototype = {
 
         for (var unitIndex = 0; unitIndex < this.units.length; unitIndex++){
 
-            if (MapCell.areEqual(this.units[unitIndex].currentMapCell, mapCell)) {
+            if (MapCell.areEqual(this.units[unitIndex].currentMapCell, mapCell)
+                ||
+                MapCell.areEqual(this.units[unitIndex].nextMapCell, mapCell)) {
                 return unitIndex;
             }
         }
@@ -876,8 +864,7 @@ UserSelectUnitState.prototype = inherit(GameState.prototype);
 extend(UserSelectUnitState.prototype, {
     constructor : UserSelectUnitState,
     handleUserAction : function (gameProperty) {
-        var unit,
-            closeCells;
+        var unit;
 
         if (!(gameProperty instanceof GameProperty))
             throw TypeError("This is not GameProperty");
@@ -894,8 +881,7 @@ extend(UserSelectUnitState.prototype, {
         unit = gameProperty.units[gameProperty.selectedUnitIndex];
 
         unit.destinationMapCell = gameProperty.leftButtonSelectedCell;
-        closeCells = gameProperty.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
-        unit.movementPath = closeCells;
+        unit.movementPath = gameProperty.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
         unit.movementPathStepIndex = 1; //!!!!!!!!!
         gameProperty.leftButtonSelectedCell = undefined;
         gameProperty.gameState = new InitialState();
@@ -907,26 +893,27 @@ extend(UserSelectUnitState.prototype, {
 
 function gameRoutine(){
 
-    var image = new Image(),
+    var image1 = new Image(),
+        image2 = new Image(),
         moveDelay = 10,
-        unit0 = new Unit("pz3", new MapCell(1, 1), new MapCell(1, 1), "upRight", image),
-        unit1 = new Unit("pz3", new MapCell(2, 1), new MapCell(2, 1), "upLeft", image),
-        unit2 = new Unit("pz3", new MapCell(3, 1), new MapCell(3, 1), "upLeft", image),
-        unit3 = new Unit("pz3", new MapCell(4, 1), new MapCell(4, 1), "upLeft", image),
-        unit4 = new Unit("pz3", new MapCell(5, 1), new MapCell(5, 1), "upLeft", image),
-        unit5 = new Unit("pz3", new MapCell(6, 1), new MapCell(6, 1), "upLeft", image),
-        unit6 = new Unit("pz3", new MapCell(7, 1), new MapCell(7, 1), "upLeft", image),
-        unit7 = new Unit("pz3", new MapCell(8, 1), new MapCell(8, 1), "upLeft", image),
-        unit8 = new Unit("pz3", new MapCell(9, 1), new MapCell(9, 1), "upLeft", image),
-        unit9 = new Unit("pz3", new MapCell(10, 1), new MapCell(10, 1), "upLeft", image),
-        unit10 = new Unit("pz3", new MapCell(11, 1), new MapCell(11, 1), "upLeft", image),
-        unit11 = new Unit("pz3", new MapCell(12, 1), new MapCell(12, 1), "upLeft", image),
-        unit12 = new Unit("pz3", new MapCell(13, 1), new MapCell(13, 1), "upLeft", image),
-        unit13 = new Unit("pz3", new MapCell(14, 1), new MapCell(14, 1), "upLeft", image),
-        unit14 = new Unit("pz3", new MapCell(15, 1), new MapCell(15, 1), "upLeft", image),
-        unit15 = new Unit("pz3", new MapCell(16, 1), new MapCell(16, 1), "upLeft", image),
-        unit16 = new Unit("pz3", new MapCell(17, 1), new MapCell(17, 1), "upLeft", image),
-        unit17 = new Unit("pz3", new MapCell(18, 1), new MapCell(18, 1), "upLeft", image),
+        unit0 = new Unit("pz3", new MapCell(1, 1), new MapCell(1, 1), "upRight", image1),
+        unit1 = new Unit("pz3", new MapCell(2, 1), new MapCell(2, 1), "upLeft", image1),
+        unit2 = new Unit("pz3", new MapCell(3, 1), new MapCell(3, 1), "upLeft", image1),
+        unit3 = new Unit("pz3", new MapCell(4, 1), new MapCell(4, 1), "upLeft", image1),
+        unit4 = new Unit("pz3", new MapCell(5, 1), new MapCell(5, 1), "upLeft", image1),
+        unit5 = new Unit("pz3", new MapCell(6, 1), new MapCell(6, 1), "upLeft", image1),
+        unit6 = new Unit("pz3", new MapCell(7, 1), new MapCell(7, 1), "upLeft", image1),
+        unit7 = new Unit("pz3", new MapCell(8, 1), new MapCell(8, 1), "upLeft", image1),
+        unit8 = new Unit("pz3", new MapCell(9, 1), new MapCell(9, 1), "upLeft", image1),
+        unit9 = new Unit("pz3", new MapCell(10, 1), new MapCell(10, 1), "upLeft", image1),
+        unit10 = new Unit("t34-42", new MapCell(11, 1), new MapCell(11, 1), "upLeft", image2),
+        unit11 = new Unit("t34-42", new MapCell(12, 1), new MapCell(12, 1), "upLeft", image2),
+        unit12 = new Unit("t34-42", new MapCell(13, 1), new MapCell(13, 1), "upLeft", image2),
+        unit13 = new Unit("t34-42", new MapCell(14, 1), new MapCell(14, 1), "upLeft", image2),
+        unit14 = new Unit("t34-42", new MapCell(15, 1), new MapCell(15, 1), "upLeft", image2),
+        unit15 = new Unit("t34-42", new MapCell(16, 1), new MapCell(16, 1), "upLeft", image2),
+        unit16 = new Unit("t34-42", new MapCell(17, 1), new MapCell(17, 1), "upLeft", image2),
+        unit17 = new Unit("t34-42", new MapCell(18, 1), new MapCell(18, 1), "upLeft", image2),
         units = [unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10, unit11, unit12, unit13, unit14, unit15, unit16, unit17],
         //units = [unit0],
         cellWidth = 50,
@@ -937,10 +924,11 @@ function gameRoutine(){
         gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, units),
         unitFinder = new UnitFinder(units),
         pathFinder = new PathFinder(battleMap, unitFinder),
-        unitsMover = new UnitsMover(units, pathFinder, cellWidth, cellHeight),
+        unitsMover = new UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, units, unitFinder, pathFinder, undefined, undefined);
 
-    image.src = 'Pz-3.png';
+    image1.src = 'Pz-3.png';
+    image2.src = 't34-42.png';
 
     function getChar(event) {
         gameProperty.currentKey = event.which;
