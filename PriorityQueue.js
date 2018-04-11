@@ -1,24 +1,30 @@
-function BinaryHeap() {
+function PriorityQueue() {
 
 }
 
-BinaryHeap.prototype = {
+PriorityQueue.prototype = {
     _array : new Array(),
 
     heapSize : function () {
         return this._array.length;
     },
 
-    add : function (value) {
+    add : function (element) {
         var i,
             parent,
             temp
 
-        this._array.push(value);
+        if(element.priority === undefined)
+            throw new TypeError("value doesn't have property priority")
+
+        if(element.value === undefined)
+            throw new TypeError("value doesn't have property value")
+
+        this._array.push(element);
         i = this.heapSize() - 1;
         parent = (i - 1) / 2;
 
-        while (i > 0 && this._array[parent] < this._array[i]) {
+        while (i > 0 && this._array[parent].priority > this._array[i].priority) {
             temp = this._array[i];
             this._array[i] = this._array[parent];
             this._array[parent] = temp;
@@ -39,11 +45,11 @@ BinaryHeap.prototype = {
             rightChild = 2 * i + 2;
             largestChild = i;
 
-            if (leftChild < this.heapSize && this._array[leftChild] > this._array[largestChild]) {
+            if (leftChild < this.heapSize && this._array[leftChild].priority < this._array[largestChild].priority) {
                 largestChild = leftChild;
             }
 
-            if (rightChild < this.heapSize && this._array[rightChild] > this._array[largestChild]) {
+            if (rightChild < this.heapSize && this._array[rightChild].priority < this._array[largestChild].priority) {
                 largestChild = rightChild;
             }
 
@@ -58,27 +64,12 @@ BinaryHeap.prototype = {
         }
     },
 
-    buildHeap : function (sourceArray) {
-        this._array = sourceArray.slice();
-        for(var i = this.heapSize() / 2; i >= 0; i--){
-            this.heapify(i);
-        }
-    },
-
-    getMax : function () {
+    getMin : function () {
         var result;
         result = this._array[0];
         this._array[0] = this._array[this.heapSize() - 1];
         this._array.pop();
         this.heapify(0);
         return result;
-    },
-
-    heapSort : function (array) {
-        this.buildHeap(array);
-        for (var i = array.length - 1; i >= 0; i--) {
-            array[i] = this.getMax();
-            this.heapify(0);
-        }
     }
 }
