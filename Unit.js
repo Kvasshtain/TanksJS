@@ -19,7 +19,7 @@ Object.freeze(direction);
 
 //=====================================================================
 
-function Unit(name, currentMapCell, destinationMapCell, orientation, image) {
+function Unit(name, currentMapCell, destinationMapCell, orientation, image, team, health) {
 
     if (!direction.validate(orientation))
         throw TypeError("currentDirection is not direction");
@@ -33,6 +33,9 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image) {
     if (!image instanceof Image)
         throw TypeError("image is not Image");
 
+    if (!isInteger(health))
+        throw TypeError("health isn't integer")
+
     this.name = name;
     this.currentMapCell = currentMapCell;
     this.nextMapCell = currentMapCell;
@@ -43,6 +46,9 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image) {
     this.renderingY = undefined;
     this.movementPath = undefined;
     this.movementPathStepIndex = 0;
+    this.team = team;
+    this.health = health;
+    this.targetUnitIndex = undefined;
 }
 
 Unit.prototype ={

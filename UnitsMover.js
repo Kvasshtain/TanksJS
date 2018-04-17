@@ -69,7 +69,7 @@ UnitsMover.prototype = {
                 continue;
             }
 
-            if ((unit.currentMapCell.xIndex != unit.nextMapCell.xIndex) || (unit.currentMapCell.yIndex != unit.nextMapCell.yIndex)){
+            if (!MapCell.areEqual(unit.currentMapCell, unit.nextMapCell)){
                 this._moveUnitsBetweenCells(unitIndex);
                 continue;
             }

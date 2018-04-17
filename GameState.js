@@ -66,7 +66,8 @@ UserSelectUnitState.prototype = inherit(GameState.prototype);
 extend(UserSelectUnitState.prototype, {
     constructor : UserSelectUnitState,
     handleUserAction : function (gameProperty) {
-        var unit;
+        var unit,
+            targetUnitIndex;
 
         if (!(gameProperty instanceof GameProperty))
             throw TypeError("This is not GameProperty");
@@ -82,9 +83,16 @@ extend(UserSelectUnitState.prototype, {
 
         unit = gameProperty.units[gameProperty.selectedUnitIndex];
 
+        targetUnitIndex = gameProperty.unitFinder.findByCoordinates(gameProperty.leftButtonSelectedCell);
+
+        if (targetUnitIndex !== undefined &&
+            unit.team != gameProperty.units[targetUnitIndex]) {
+            unit.targetUnitIndex = targetUnitIndex;
+        }
+
         unit.destinationMapCell = gameProperty.leftButtonSelectedCell;
-        unit.movementPath = gameProperty.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
-        unit.movementPathStepIndex = 1; //!!!!!!!!!
+        unit.movementPath = gameProperty.pathFinder.findPath(unit.nextMapCell, unit.destinationMapCell);
+        unit.movementPathStepIndex = 1;
         gameProperty.leftButtonSelectedCell = undefined;
         gameProperty.gameState = new InitialState();
         return;

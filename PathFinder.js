@@ -33,9 +33,10 @@ PathFinder.prototype = {
         return surroundingCells;
     },
 
-    _throwOutObstacles : function (cells) {
+    _throwOutObstacles : function (cells, destinationCell) {
         for (var i = 0; i < cells.length; i++){
-            if (this.unitFinder.findByCoordinates(cells[i]) !== undefined) {
+            if ((this.unitFinder.findByCoordinates(cells[i]) !== undefined)
+            && !MapCell.areEqual(cells[i], destinationCell)) {
                 cells.splice(i, 1);
                 i--;
             }
@@ -58,27 +59,6 @@ PathFinder.prototype = {
             y = secondCell.yIndex - firstCell.yIndex;
         return Math.sqrt(x*x + y*y);
         //return Math.abs(x) + Math.abs(y);
-    },
-
-    _dequeueCellWithMinPriority : function (currentToDestinationWeights, openCells) {
-        var minXIndex,
-            minYIndex,
-            currentWeights,
-            openCellsMinIndex,
-            min = this.battleMap.rowNum + this.battleMap.columnNum;
-
-        for (var i = 0; i < openCells.length; i++) {
-            currentWeights = currentToDestinationWeights[openCells[i].xIndex][openCells[i].yIndex];
-            if (currentWeights < min) {
-                min = currentWeights;
-                minXIndex = openCells[i].xIndex;
-                minYIndex = openCells[i].yIndex;
-                openCellsMinIndex = i;
-            }
-        }
-
-        openCells.splice(openCellsMinIndex,1);
-        return new MapCell(minXIndex, minYIndex);
     },
 
     _enqueueCell : function (cell, cellArray) {
@@ -196,7 +176,7 @@ PathFinder.prototype = {
         if (!this.battleMap.isCellInMap(destinationCell))
             throw RangeError("destinationCell out of battleMap");
 
-        var openCells = [],
+        var openCells = new PriorityQueue(),
             closeCells = [],
             cameFromCells = [],
             resultWay,
@@ -207,13 +187,13 @@ PathFinder.prototype = {
             newCost,
             next;
 
-        openCells.push(startCell);
+        openCells.add({priority : 0, value : startCell});
         costSoFar[startCell.xIndex][startCell.yIndex] = 0;
         priority[startCell.xIndex][startCell.yIndex]
             = costSoFar[startCell.xIndex][startCell.yIndex] + this._heuristicFunction(startCell, destinationCell);
 
-        while (openCells.length > 0) {
-            currentCell = this._dequeueCellWithMinPriority(priority, openCells);
+        while (openCells.length() > 0) {
+            currentCell = openCells.getMinPriorityElement();
 
             if (MapCell.areEqual(currentCell, destinationCell)) {
                 cameFromCells.push(destinationCell);
@@ -221,29 +201,24 @@ PathFinder.prototype = {
                 return resultWay;
             }
 
-            this._removeCertainCellFromArray(openCells, currentCell);
             this._enqueueCell(currentCell, closeCells);
             surroundingCells = this._findSurroundingCells(currentCell);
-            this._throwOutObstacles(surroundingCells);
+            this._throwOutObstacles(surroundingCells, destinationCell);
             this._throwOutCloseCells(surroundingCells, closeCells);
 
             for(var i = 0; i < surroundingCells.length; i++) {
                 next = surroundingCells[i];
                 newCost = costSoFar[currentCell.xIndex][currentCell.yIndex] + 1;
-
-                if (!this._isCellInOpen(next, openCells)
+                if (costSoFar[next.xIndex][next.yIndex] === undefined
                     || newCost < costSoFar[next.xIndex][next.yIndex]) {
                     this._enqueueCell(currentCell, cameFromCells);
                     costSoFar[next.xIndex][next.yIndex] = newCost;
                     priority[next.xIndex][next.yIndex] =
                         newCost + this._heuristicFunction(next, destinationCell);
-                    this._enqueueCell(next, openCells);
+                    openCells.add({priority : priority[next.xIndex][next.yIndex], value : next});
                 }
             }
         }
-
         return undefined;
-
-        return closeCells;
     }
 }
