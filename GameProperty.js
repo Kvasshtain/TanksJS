@@ -1,4 +1,7 @@
-function GameProperty(currentKey, selectedUnitIndex, units, unitFinder, pathFinder, leftButtonSelectedCell, rightButtonSelectedCell){
+function GameProperty(currentKey, selectedUnitIndex, units, unitFinder, leftButtonSelectedCell, rightButtonSelectedCell){
+
+    if (!isInteger(selectedUnitIndex))
+        throw TypeError("units isn't integer");
 
     if (!(units instanceof Array) && units !== undefined)
         throw TypeError("units is not Array or undefined");
@@ -6,13 +9,18 @@ function GameProperty(currentKey, selectedUnitIndex, units, unitFinder, pathFind
     if (!(unitFinder instanceof UnitFinder))
         throw TypeError("unitFinder is not UnitFinder");
 
+    if (!(leftButtonSelectedCell instanceof MapCell) && leftButtonSelectedCell != undefined)
+        throw TypeError("leftButtonSelectedCell is not MapCell");
+
+    if (!(rightButtonSelectedCell instanceof MapCell) && rightButtonSelectedCell != undefined)
+        throw TypeError("rightButtonSelectedCell is not MapCell");
+
     this.currentKey = currentKey;
     this.leftButtonSelectedCell = leftButtonSelectedCell;
     this.rightButtonSelectedCell = rightButtonSelectedCell;
     this.selectedUnitIndex = selectedUnitIndex;
     this.units = units;
     this.unitFinder = unitFinder;
-    this.pathFinder = pathFinder;
     this.gameState = new InitialState();
 }
 

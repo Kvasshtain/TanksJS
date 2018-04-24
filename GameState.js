@@ -85,14 +85,18 @@ extend(UserSelectUnitState.prototype, {
 
         targetUnitIndex = gameProperty.unitFinder.findByCoordinates(gameProperty.leftButtonSelectedCell);
 
-        if (targetUnitIndex !== undefined &&
-            unit.team != gameProperty.units[targetUnitIndex]) {
+        if (targetUnitIndex !== undefined) {
+
             unit.targetUnitIndex = targetUnitIndex;
+
+            gameProperty.leftButtonSelectedCell = undefined;
+            gameProperty.gameState = new InitialState();
+            return;
         }
 
+        unit.targetUnitIndex = undefined;
+
         unit.destinationMapCell = gameProperty.leftButtonSelectedCell;
-        unit.movementPath = gameProperty.pathFinder.findPath(unit.nextMapCell, unit.destinationMapCell);
-        unit.movementPathStepIndex = 1;
         gameProperty.leftButtonSelectedCell = undefined;
         gameProperty.gameState = new InitialState();
         return;

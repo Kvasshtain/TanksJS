@@ -36,6 +36,35 @@ function UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight){
 UnitsMover.prototype = {
     constructor : UnitsMover,
 
+    moveUnits : function () {
+        var length = this.units.length;
+
+        for (var unitIndex = 0; unitIndex < length; unitIndex++) {
+            var unit = this.units[unitIndex],
+                closeCells;
+
+            if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
+                continue;
+            }
+
+            if (!MapCell.areEqual(unit.currentMapCell, unit.nextMapCell)){
+                this._moveUnitsBetweenCells(unitIndex);
+                continue;
+            }
+
+            if (unit.isStopForShot) {
+                continue;
+            }
+
+            if (unit.movementPath != undefined) {
+                this._turnAndMoveUnit(unit, unit.movementPath[unit.movementPathStepIndex]);
+                if (unit.movementPathStepIndex < unit.movementPath.length - 1) {
+                    unit.movementPathStepIndex++;
+                }
+            }
+        }
+    },
+
     _turnAndMoveUnit : function(unit, nextCell) {
 
         if (MapCell.areEqual(nextCell, unit.destinationMapCell)
@@ -56,31 +85,6 @@ UnitsMover.prototype = {
         unit.orientation = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
 
         unit.nextMapCell = nextCell;
-    },
-
-    moveUnits : function () {
-        var length = this.units.length;
-
-        for (var unitIndex = 0; unitIndex < length; unitIndex++) {
-            var unit = this.units[unitIndex],
-                closeCells;
-
-            if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
-                continue;
-            }
-
-            if (!MapCell.areEqual(unit.currentMapCell, unit.nextMapCell)){
-                this._moveUnitsBetweenCells(unitIndex);
-                continue;
-            }
-
-            if (unit.movementPath != undefined) {
-                this._turnAndMoveUnit(unit, unit.movementPath[unit.movementPathStepIndex]);
-                if (unit.movementPathStepIndex < unit.movementPath.length - 1) {
-                    unit.movementPathStepIndex++;
-                }
-            }
-        }
     },
 
     _moveUnitsBetweenCells : function (i) {

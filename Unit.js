@@ -19,7 +19,7 @@ Object.freeze(direction);
 
 //=====================================================================
 
-function Unit(name, currentMapCell, destinationMapCell, orientation, image, team, health) {
+function Unit(name, currentMapCell, destinationMapCell, orientation, image, team, health, fireRadius) {
 
     if (!direction.validate(orientation))
         throw TypeError("currentDirection is not direction");
@@ -36,6 +36,9 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     if (!isInteger(health))
         throw TypeError("health isn't integer")
 
+    if ("number" != typeof fireRadius)
+        throw TypeError("fireRadius isn't number");
+
     this.name = name;
     this.currentMapCell = currentMapCell;
     this.nextMapCell = currentMapCell;
@@ -49,6 +52,9 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     this.team = team;
     this.health = health;
     this.targetUnitIndex = undefined;
+    this.fireRadius = fireRadius;
+    this.canShootOnMove = false;
+    this.isStopForShot = false;
 }
 
 Unit.prototype ={
