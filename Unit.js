@@ -55,6 +55,8 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     this.fireRadius = fireRadius;
     this.canShootOnMove = false;
     this.isStopForShot = false;
+    this._rechargeGunTime = 100;
+    this._rechargeGunTimer = this._rechargeGunTime;
 }
 
 Unit.prototype ={

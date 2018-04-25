@@ -53,13 +53,18 @@ function gameRoutine(){
         unitsMover = new UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, units, unitFinder, undefined, undefined),
         unitStriker = new UnitStriker(units),
-        unitTracker = new UnitTracker(units);
+        unitTracker = new UnitTracker(units),
+        gameTimer = new GameTimer();
 
     image1.src = 'Pz-3.png';
     image2.src = 't34-42.png';
 
     function getChar(event) {
         gameProperty.currentKey = event.which;
+    }
+
+    function testTimer() {
+        alert("Ху-Ху!");
     }
 
     document.onkeydown = getChar;
@@ -91,7 +96,7 @@ function gameRoutine(){
     gameDrawer.canvas.onclick = gameClickHandler;
 
     function updateGame() {
-
+        gameTimer.countUp();
         gameDrawer.drawMap();
         gameProperty.gameState.handleUserAction(gameProperty);
         findPathForAllUnits(units, pathFinder);

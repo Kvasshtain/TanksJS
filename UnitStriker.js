@@ -70,6 +70,10 @@ UnitStriker.prototype = {
         unit.isStopForShot = false;
     },
 
+    _shoot : function () {
+
+    },
+
     unitFightRoutine : function () {
         var units = this.units,
             unit,
@@ -80,6 +84,8 @@ UnitStriker.prototype = {
             enemyObjectIndex = this._findEnemyInFireRadius(i);
 
             this._stopUnitForFire(unit, enemyObjectIndex);
+
+
         }
     }
 }
