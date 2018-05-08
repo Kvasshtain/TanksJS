@@ -44,7 +44,7 @@ extend(UserSelectCellState.prototype, {
             return;
         }
 
-        gameProperty.selectedUnitIndex = gameProperty.unitFinder.findByCoordinates(gameProperty.leftButtonSelectedCell);
+        gameProperty.selectedUnitIndex = gameProperty.unitFinder.findByMapCell(gameProperty.leftButtonSelectedCell);
 
         if (gameProperty.selectedUnitIndex !== undefined){
             gameProperty.gameState = new UserSelectUnitState();
@@ -83,7 +83,7 @@ extend(UserSelectUnitState.prototype, {
 
         unit = gameProperty.units[gameProperty.selectedUnitIndex];
 
-        targetUnitIndex = gameProperty.unitFinder.findByCoordinates(gameProperty.leftButtonSelectedCell);
+        targetUnitIndex = gameProperty.unitFinder.findByMapCell(gameProperty.leftButtonSelectedCell);
 
         if (targetUnitIndex !== undefined) {
 

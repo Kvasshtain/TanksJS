@@ -35,7 +35,7 @@ PathFinder.prototype = {
 
     _throwOutObstacles : function (cells, destinationCell) {
         for (var i = 0; i < cells.length; i++){
-            if ((this.unitFinder.findByCoordinates(cells[i]) !== undefined)
+            if ((this.unitFinder.findByMapCell(cells[i]) !== undefined)
             && !MapCell.areEqual(cells[i], destinationCell)) {
                 cells.splice(i, 1);
                 i--;

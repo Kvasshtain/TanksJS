@@ -43,6 +43,9 @@ UnitsMover.prototype = {
             var unit = this.units[unitIndex],
                 closeCells;
 
+            if (unit.health <= 0)
+                continue;
+
             if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
                 continue;
             }
@@ -69,14 +72,14 @@ UnitsMover.prototype = {
 
         if (MapCell.areEqual(nextCell, unit.destinationMapCell)
             &&
-            (this.unitFinder.findByCoordinates(nextCell) !== undefined)) {
+            (this.unitFinder.findByMapCell(nextCell) !== undefined)) {
             unit.destinationMapCell = unit.currentMapCell;
             unit.nextMapCell = unit.currentMapCell;
             unit.movementPathStepIndex = 0;
             return;
         }
 
-        if (this.unitFinder.findByCoordinates(nextCell) !== undefined) {
+        if (this.unitFinder.findByMapCell(nextCell) !== undefined) {
             unit.movementPath = this.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
             unit.movementPathStepIndex = 1;
             nextCell = unit.movementPath[unit.movementPathStepIndex];

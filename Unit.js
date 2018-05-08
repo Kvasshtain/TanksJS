@@ -7,6 +7,7 @@ var direction = {
     downRight: "downRight",
     downLeft: "downLeft",
     upLeft: "upLeft",
+
     validate: function (value) {
         for(var dir in this){
             if(dir == value) return true;
@@ -45,6 +46,8 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     this.destinationMapCell = destinationMapCell;
     this.orientation = orientation;
     this.image = image;
+    this.gunShellImage = new Image();
+    this.gunShellImage.src = 'redGunShell.png';
     this.renderingX = undefined;
     this.renderingY = undefined;
     this.movementPath = undefined;
@@ -55,10 +58,34 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     this.fireRadius = fireRadius;
     this.canShootOnMove = false;
     this.isStopForShot = false;
-    this._rechargeGunTime = 100;
-    this._rechargeGunTimer = this._rechargeGunTime;
+    this.rechargeGunTime = 100;
+    this.rechargeGunTimer = this.rechargeGunTime;
+    this.damage = 1;
+    this.disappearanceCount = 500;
 }
 
 Unit.prototype ={
-    constructor: Unit
+    constructor: Unit,
+
+    stop : function () {
+        this.destinationMapCell = this.nextMapCell;
+        this.movementPath = undefined;
+        this.movementPathStepIndex = 0;
+    }
+}
+
+Unit.CalculateDistance = function (unit1, unit2) {
+    var xDistance,
+        yDistance;
+
+    if (!(unit1 instanceof Unit))
+        throw TypeError("unit1 is not Unit");
+
+    if (!(unit2 instanceof Unit))
+        throw TypeError("unit2 is not Unit");
+
+    xDistance = unit1.renderingX - unit2.renderingX;
+    yDistance = unit1.renderingY - unit2.renderingY;
+
+    return Math.sqrt(xDistance * xDistance + yDistance * yDistance);
 }

@@ -1,16 +1,25 @@
-function GameDrawer(cellWidth, cellHeight, battleMap, units) {
+function GameDrawer(cellWidth, cellHeight, battleMap, units, gunShells) {
 
     if (!(units instanceof Array))
-        throw TypeError("This is not Array");
+        throw TypeError("units is not Array");
 
     for (var i = 0; i < units.length; i++)
     {
         if (!(units[i] instanceof Unit))
-            throw TypeError("This is not Unit");
+            throw TypeError("units[i] is not Unit");
+    }
+
+    if (!(gunShells instanceof Array))
+        throw TypeError("gunShells is not Array");
+
+    for (var i = 0; i < gunShells.length; i++)
+    {
+        if (!(gunShells[i] instanceof GunShell))
+            throw TypeError("gunShells[i] is not GunShell");
     }
 
     if (!(battleMap instanceof BattleMap))
-        throw TypeError("This is not BattleMap");
+        throw TypeError("battleMap is not BattleMap");
 
     if (cellWidth === undefined)
         throw TypeError("cellWidth === undefined");
@@ -34,6 +43,7 @@ function GameDrawer(cellWidth, cellHeight, battleMap, units) {
     this.cellHeight = cellHeight;
     this.battleMap = battleMap;
     this.units = units;
+    this.gunShells = gunShells;
 
     var canvas,
         body,
@@ -57,6 +67,9 @@ function GameDrawer(cellWidth, cellHeight, battleMap, units) {
     console.log(cursorLayer);
 
     this.drawArea = canvas.getContext("2d");
+
+    this.smokeImage = new Image();
+    this.smokeImage.src = 'smoke.png';
 }
 
 GameDrawer.prototype ={
@@ -64,8 +77,8 @@ GameDrawer.prototype ={
 
     drawMap: function () {
 
-        var width = this.cellWidth - 1,
-            height = this.cellHeight - 1;
+        var width = this.cellWidth,
+            height = this.cellHeight;
 
         this.drawArea.fillStyle = "green";
 
@@ -82,26 +95,28 @@ GameDrawer.prototype ={
 
     drawUnits: function () {
 
-        var width = this.cellWidth - 1,
-            height = this.cellHeight - 1,
+        var width = this.cellWidth,
+            height = this.cellHeight,
             x,
             y,
             image,
-            orientation;
+            orientation,
+            unit;
 
         for(var i = 0; i < this.units.length; i++){
+            unit = this.units[i];
 
-            if ((this.units[i].renderingX === undefined) || (this.units[i].renderingY === undefined)) {
-                this.units[i].renderingX = this.cellHeight * this.units[i].currentMapCell.xIndex;
-                this.units[i].renderingY = this.cellWidth * this.units[i].currentMapCell.yIndex;
+            if ((unit.renderingX === undefined) || (unit.renderingY === undefined)) {
+                unit.renderingX = this.cellHeight * unit.currentMapCell.xIndex;
+                unit.renderingY = this.cellWidth * unit.currentMapCell.yIndex;
             }
 
-            x = this.units[i].renderingX;
-            y = this.units[i].renderingY;
+            x = unit.renderingX;
+            y = unit.renderingY;
 
-            orientation = this.units[i].orientation;
+            orientation = unit.orientation;
 
-            image = this.units[i].image;
+            image = unit.image;
             this.drawArea.save();
             this.drawArea.translate(x + width/2,y + height/2);
             switch (orientation) {
@@ -130,6 +145,59 @@ GameDrawer.prototype ={
             this.drawArea.translate(-(x + width/2),-(y + height/2));
             this.drawArea.drawImage(image, x, y, width, height);
             this.drawArea.restore();
+
+            this._drawUnitHealth(x, y, unit.health);
+        }
+    },
+
+    _drawUnitHealth : function (x, y, health) {
+        var width = this.cellWidth,
+            height = this.cellHeight;
+
+        this.drawArea.font = "5px Georgia";
+        this.drawArea.fillStyle = "fuchsia";
+        this.drawArea.fillText(health, x, y);
+    },
+
+    drawGunShell : function () {
+
+        var width = this.cellWidth / 15,
+            height = this.cellHeight / 15,
+            x,
+            y,
+            image,
+            gunShell;
+
+        for (var i = 0; i < this.gunShells.length; i++){
+
+            gunShell = this.gunShells[i];
+            image = gunShell.image;
+            x = gunShell.currentPoint.x + this.cellWidth / 2 - width / 2;
+            y = gunShell.currentPoint.y + this.cellHeight / 2 - height / 2;
+            if (x === undefined || y === undefined) {
+                continue;
+            }
+            this.drawArea.drawImage(image, x, y, width, height);
+        }
+    },
+
+    drawSmoke : function () {
+        var width = this.cellWidth,
+            height = this.cellHeight,
+            x,
+            y,
+            unit;
+
+        for(var i = 0; i < this.units.length; i++) {
+            unit = this.units[i];
+
+            if (unit.health > 0)
+                continue;
+
+            x = unit.renderingX;
+            y = unit.renderingY;
+
+            this.drawArea.drawImage(this.smokeImage, x, y, width, height);
         }
     }
 }
