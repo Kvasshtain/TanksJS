@@ -146,7 +146,7 @@ GameDrawer.prototype ={
             this.drawArea.drawImage(image, x, y, width, height);
             this.drawArea.restore();
 
-            this._drawUnitHealth(x, y, unit.health);
+            //this._drawUnitHealth(x, y, unit.health);
         }
     },
 
