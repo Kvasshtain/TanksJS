@@ -1,11 +1,11 @@
-function UnitFinder(units, cellWidth, cellHeight){
+function UnitFinder(shootableObjects, cellWidth, cellHeight){
 
-    if (!(units instanceof Array) && !(units instanceof Object))
+    if (!(shootableObjects instanceof Array) && !(shootableObjects instanceof Object))
         throw TypeError("This is not Array or Object");
 
-    for (var i = 0; i < units.length; i++){
-        if (!(units[i] instanceof Unit))
-            throw TypeError("This is not Unit");
+    for (var i = 0; i < shootableObjects.length; i++){
+        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
+            throw TypeError("This is not ShootableObject");
     }
 
     if (cellWidth === undefined)
@@ -20,7 +20,7 @@ function UnitFinder(units, cellWidth, cellHeight){
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.units = units;
+    this.shootableObjects = shootableObjects;
     this.unitHalfWidth = cellWidth / 2;
     this.unitHalfHeight = cellHeight / 2;
 }
@@ -28,16 +28,16 @@ function UnitFinder(units, cellWidth, cellHeight){
 UnitFinder.prototype = {
     constructor : UnitFinder,
 
-    findByMapCell : function (mapCell) {
+    findByMapCellObjIndex : function (mapCell) {
 
         if (!(mapCell instanceof MapCell))
             throw TypeError("This is not MapCell");
 
-        for (var unitIndex = 0; unitIndex < this.units.length; unitIndex++){
+        for (var unitIndex = 0; unitIndex < this.shootableObjects.length; unitIndex++){
 
-            if (MapCell.areEqual(this.units[unitIndex].currentMapCell, mapCell)
+            if (MapCell.areEqual(this.shootableObjects[unitIndex].currentMapCell, mapCell)
                 ||
-                MapCell.areEqual(this.units[unitIndex].nextMapCell, mapCell)) {
+                MapCell.areEqual(this.shootableObjects[unitIndex].nextMapCell, mapCell)) {
                 return unitIndex;
             }
         }
@@ -45,16 +45,16 @@ UnitFinder.prototype = {
         return undefined;
     },
 
-    findByCoordinates : function (point) {
+    findByCoordinatesObjIndex : function (point) {
         var unitX,
             unitY;
 
         if (!point instanceof Point)
             throw TypeError("point isn't Point");
 
-        for (var unitIndex = 0; unitIndex < this.units.length; unitIndex++){
-            unitX = this.units[unitIndex].renderingX;
-            unitY = this.units[unitIndex].renderingY;
+        for (var unitIndex = 0; unitIndex < this.shootableObjects.length; unitIndex++){
+            unitX = this.shootableObjects[unitIndex].renderingX;
+            unitY = this.shootableObjects[unitIndex].renderingY;
 
             if (((unitX - this.unitHalfWidth < point.x) && (point.x < unitX + this.unitHalfWidth))
                 &&

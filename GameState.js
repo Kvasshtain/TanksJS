@@ -44,7 +44,7 @@ extend(UserSelectCellState.prototype, {
             return;
         }
 
-        gameProperty.selectedUnitIndex = gameProperty.unitFinder.findByMapCell(gameProperty.leftButtonSelectedCell);
+        gameProperty.selectedUnitIndex = gameProperty.unitFinder.findByMapCellObjIndex(gameProperty.leftButtonSelectedCell);
 
         if (gameProperty.selectedUnitIndex !== undefined){
             gameProperty.gameState = new UserSelectUnitState();
@@ -81,20 +81,20 @@ extend(UserSelectUnitState.prototype, {
             return;
         }
 
-        unit = gameProperty.units[gameProperty.selectedUnitIndex];
+        unit = gameProperty.shootableObjects[gameProperty.selectedUnitIndex];
 
-        targetUnitIndex = gameProperty.unitFinder.findByMapCell(gameProperty.leftButtonSelectedCell);
+        targetUnitIndex = gameProperty.unitFinder.findByMapCellObjIndex(gameProperty.leftButtonSelectedCell);
 
         if (targetUnitIndex !== undefined) {
 
-            unit.targetUnitIndex = targetUnitIndex;
+            unit.targetIndex = targetUnitIndex;
 
             gameProperty.leftButtonSelectedCell = undefined;
             gameProperty.gameState = new InitialState();
             return;
         }
 
-        unit.targetUnitIndex = undefined;
+        unit.targetIndex = undefined;
 
         unit.destinationMapCell = gameProperty.leftButtonSelectedCell;
         gameProperty.leftButtonSelectedCell = undefined;

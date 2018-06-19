@@ -1,4 +1,4 @@
-function PathFinder(battleMap, unitFinder) {
+function PathFinder(battleMap, unitFinder, mapObjectFinder) {
 
     if(!(battleMap instanceof BattleMap))
         throw TypeError("This is not BattleMap");
@@ -6,8 +6,12 @@ function PathFinder(battleMap, unitFinder) {
     if (!(unitFinder instanceof UnitFinder))
         throw TypeError("unitFinder is not UnitFinder");
 
+    if (!(mapObjectFinder instanceof MapObjectFinder))
+        throw TypeError("mapObjectFinder is not MapObjectsFinder");
+
     this.battleMap = battleMap;
     this.unitFinder = unitFinder;
+    this.mapObjectFinder = mapObjectFinder;
 }
 
 PathFinder.prototype = {
@@ -35,11 +39,22 @@ PathFinder.prototype = {
 
     _throwOutObstacles : function (cells, destinationCell) {
         for (var i = 0; i < cells.length; i++){
-            if ((this.unitFinder.findByMapCell(cells[i]) !== undefined)
-            && !MapCell.areEqual(cells[i], destinationCell)) {
+            if (((this.unitFinder.findByMapCellObjIndex(cells[i]) !== undefined)
+                 ||
+                 (this.mapObjectFinder.findByMapCellImpassableObjIndex(cells[i]) !== undefined))
+                 &&
+                 !MapCell.areEqual(cells[i], destinationCell)) {
                 cells.splice(i, 1);
                 i--;
+                continue;
             }
+
+            // if ((this.mapObjectFinder.findByMapCellImpassableObjIndex(cells[i]) !== undefined)
+            //  && (!MapCell.areEqual(cells[i], destinationCell))){
+            //     cells.splice(i, 1);
+            //     i--;
+            //     continue;
+            // }
         }
     },
 

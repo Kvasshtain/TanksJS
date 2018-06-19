@@ -1,9 +1,29 @@
-function UnitTracker(units) {
+function UnitTracker(units, cellWidth, cellHeight) {
 
     if (!(units instanceof Array) && units !== undefined)
-        throw TypeError("units is not Array or undefined");
+        throw TypeError("shootableObjects is not Array or undefined");
 
-    this.units = units;
+    if (cellWidth === undefined)
+        throw TypeError("cellWidth === undefined");
+
+    if (cellHeight === undefined)
+        throw TypeError("cellHeight === undefined");
+
+    if ("number" !== typeof cellWidth)
+        throw TypeError("cellWidth isn't number");
+
+    if ("number" !== typeof cellHeight)
+        throw TypeError("cellHeight isn't number");
+
+    if (cellWidth <= 0)
+        throw RangeError("cellWidth <= 0");
+
+    if (cellHeight <= 0)
+        throw RangeError("cellHeight <= 0");
+
+    this.shootableObjects = units;
+    this.cellWidth = cellWidth;
+    this.cellHeight = cellHeight;
 }
 
 UnitTracker.prototype = {
@@ -14,22 +34,22 @@ UnitTracker.prototype = {
             targetUnit,
             distance;
 
-        for (var i = 0; i < this.units.length; i++) {
-            unit = this.units[i];
+        for (var i = 0; i < this.shootableObjects.length; i++) {
+            unit = this.shootableObjects[i];
 
-            if (unit.targetUnitIndex === undefined) {
+            if (unit.targetIndex === undefined) {
                 continue;
             }
 
-            targetUnit = this.units[unit.targetUnitIndex];
+            targetUnit = this.shootableObjects[unit.targetIndex];
 
             if (targetUnit.health <= 0) {
-                unit.targetUnitIndex = undefined;
+                unit.targetIndex = undefined;
                 unit.stop();
                 continue;
             }
 
-            distance = Unit.CalculateDistance(unit, targetUnit);
+            distance = GameObject.CalculateDistance(unit, targetUnit, this.cellHeight, this.cellWidth);
 
             if ((targetUnit.team != unit.team)
              && (distance < unit.fireRadius)) {

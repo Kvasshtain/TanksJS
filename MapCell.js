@@ -50,6 +50,12 @@ MapCell.areEqual = function (firstCell, secondCell) {
     if (!secondCell instanceof MapCell)
         throw new TypeError("secondCell is not MapCell");
 
+    if (firstCell === undefined)
+        return false;
+
+    if (secondCell === undefined)
+        return false;
+
     if ((firstCell.xIndex == secondCell.xIndex) && (firstCell.yIndex == secondCell.yIndex)){
         return true;
     }

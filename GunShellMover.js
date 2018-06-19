@@ -1,14 +1,22 @@
-function GunShellMover(gunShells, units, unitFinder, cellWidth, cellHeight) {
+function GunShellMover(gunShells, shootableObjects, unitFinder, mapObjectFinder, cellWidth, cellHeight) {
     var averageCellSize;
 
-    if (!(units instanceof Array) && units !== undefined)
-        throw TypeError("units is not Array or undefined");
+    if (!(shootableObjects instanceof Array) && shootableObjects !== undefined)
+        throw TypeError("shootableObjects isn't Array or undefined");
+
+    for (var i = 0; i < shootableObjects.length; i++){
+        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
+            throw TypeError("This is not ShootableObject");
+    }
 
     if (!(gunShells instanceof Array) && gunShells !== undefined)
-        throw TypeError("gunShells is not Array or undefined");
+        throw TypeError("gunShells isn't Array or undefined");
 
     if (!(unitFinder instanceof UnitFinder))
-        throw TypeError("This is not UnitFinder");
+        throw TypeError("unitFinder isn't UnitFinder");
+
+    if (!(mapObjectFinder instanceof MapObjectFinder))
+        throw TypeError("mapObjectsFinder isn't MapObjectFinder");
 
     if (cellWidth === undefined)
         throw TypeError("cellWidth === undefined");
@@ -22,9 +30,10 @@ function GunShellMover(gunShells, units, unitFinder, cellWidth, cellHeight) {
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.units = units;
+    this.shootableObjects = shootableObjects;
     this.gunShells = gunShells;
     this.unitFinder = unitFinder;
+    this.mapObjectFinder = mapObjectFinder;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
     averageCellSize = (this.cellWidth + this.cellHeight) / 2;
@@ -49,6 +58,11 @@ GunShellMover.prototype = {
                 continue;
             }
 
+            if (this.mapObjectFinder.findByCoordinatesGunShellImpenetrableObjIndex(gunShell.currentPoint) !== undefined) {
+                this._destroyGunShell(gunShellIndex);
+                continue;
+            }
+
             sinAzimuth = Math.sin(gunShell.azimuth);
             cosAzimuth = Math.cos(gunShell.azimuth);
 
@@ -62,23 +76,28 @@ GunShellMover.prototype = {
         }
     },
 
-    _explodeGunShell : function (gunShellIndex) {
-
-        this._makeDamage(gunShellIndex);
+    _destroyGunShell : function (gunShellIndex) {
 
         this.gunShells.splice(gunShellIndex, 1);
     },
 
+    _explodeGunShell : function (gunShellIndex) {
+
+        this._makeDamage(gunShellIndex);
+
+        this._destroyGunShell(gunShellIndex);
+    },
+
     _makeDamage : function (gunShellIndex) {
         var gunShell = this.gunShells[gunShellIndex],
-            unitIndex = this.unitFinder.findByCoordinates(gunShell.targetPoint);
+            unitIndex = this.unitFinder.findByCoordinatesObjIndex(gunShell.targetPoint);
 
         if (unitIndex === undefined)
             return;
 
-        if (this.units[unitIndex].health == 0)
+        if (this.shootableObjects[unitIndex].health == 0)
             return;
 
-        this.units[unitIndex].health -= gunShell.damage;
+        this.shootableObjects[unitIndex].health -= gunShell.damage;
     }
 }

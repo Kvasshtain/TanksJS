@@ -1,10 +1,10 @@
 function GameProperty(currentKey, selectedUnitIndex, units, unitFinder, leftButtonSelectedCell, rightButtonSelectedCell){
 
     if (!isInteger(selectedUnitIndex))
-        throw TypeError("units isn't integer");
+        throw TypeError("shootableObjects isn't integer");
 
     if (!(units instanceof Array) && units !== undefined)
-        throw TypeError("units is not Array or undefined");
+        throw TypeError("shootableObjects is not Array or undefined");
 
     if (!(unitFinder instanceof UnitFinder))
         throw TypeError("unitFinder is not UnitFinder");
@@ -19,7 +19,7 @@ function GameProperty(currentKey, selectedUnitIndex, units, unitFinder, leftButt
     this.leftButtonSelectedCell = leftButtonSelectedCell;
     this.rightButtonSelectedCell = rightButtonSelectedCell;
     this.selectedUnitIndex = selectedUnitIndex;
-    this.units = units;
+    this.shootableObjects = units;
     this.unitFinder = unitFinder;
     this.gameState = new InitialState();
 }

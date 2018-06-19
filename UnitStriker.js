@@ -1,13 +1,21 @@
-function UnitStriker(units, gunShells, unitFinder, cellWidth, cellHeight) {
+function UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight) {
 
-    if (!(units instanceof Array) && units !== undefined)
-        throw TypeError("units is not Array or undefined");
+    if (!(shootableObjects instanceof Array) && shootableObjects !== undefined)
+        throw TypeError("shootableObjects isn't Array or undefined");
+
+    for (var i = 0; i < shootableObjects.length; i++){
+        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
+            throw TypeError("This is not ShootableObject");
+    }
 
     if (!(gunShells instanceof Array) && gunShells !== undefined)
-        throw TypeError("gunShells is not Array or undefined");
+        throw TypeError("gunShells isn't Array or undefined");
 
     if (!(unitFinder instanceof UnitFinder))
-        throw TypeError("This is not UnitFinder");
+        throw TypeError("unitFinder isn't UnitFinder");
+
+    if (!(mapObjectFinder instanceof MapObjectFinder))
+        throw TypeError("mapObjectsFinder isn't MapObjectFinder")
 
     if (cellWidth === undefined)
         throw TypeError("cellWidth === undefined");
@@ -15,24 +23,43 @@ function UnitStriker(units, gunShells, unitFinder, cellWidth, cellHeight) {
     if (cellHeight === undefined)
         throw TypeError("cellHeight === undefined");
 
+    if ("number" !== typeof cellWidth)
+        throw TypeError("cellWidth isn't number");
+
+    if ("number" !== typeof cellHeight)
+        throw TypeError("cellHeight isn't number");
+
     if (cellWidth <= 0)
         throw RangeError("cellWidth <= 0");
 
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.units = units;
+    this.shootableObjects = shootableObjects;
     this.gunShells = gunShells;
     this.unitFinder = unitFinder;
+    this.mapObjectFinder = mapObjectFinder;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
-    this.gunShellMover = new GunShellMover(this.gunShells, this.units, this.unitFinder, this.cellWidth, this.cellHeight)
+    this.gunShellMover =
+        new GunShellMover(
+            this.gunShells,
+            this.shootableObjects,
+            this.unitFinder,
+            this.mapObjectFinder,
+            this.cellWidth,
+            this.cellHeight
+        )
 }
 
 UnitStriker.prototype = {
     constructor : UnitStriker,
 
     _isUnitInMotion : function(unit) {
+
+        if (unit.destinationMapCell === undefined)
+            return false;
+
         return !MapCell.areEqual(unit.destinationMapCell, unit.currentMapCell);
     },
 
@@ -41,7 +68,7 @@ UnitStriker.prototype = {
     },
 
     _canHit : function (unit, enemyObject) {
-        var distanceToEnemy = Unit.CalculateDistance(unit, enemyObject);
+        var distanceToEnemy = GameObject.CalculateDistance(unit, enemyObject, this.cellHeight, this.cellWidth);
 
         return distanceToEnemy < unit.fireRadius;
     },
@@ -50,30 +77,30 @@ UnitStriker.prototype = {
         return enemyObject.health > 0;
     },
 
-    _findEnemyInFireRadius : function (unitIndex) {
-        var unit = this.units[unitIndex],
-            targetUnitIndex = unit.targetUnitIndex,
-            myTeam = unit.team;
+    _findEnemyInFireRadius : function (shootableObjectIndex) {
+        var shootableObject = this.shootableObjects[shootableObjectIndex],
+            targetObjectIndex = shootableObject.targetIndex,
+            myTeam = shootableObject.team;
 
-        if ((targetUnitIndex !== undefined)
-         && (this._isObjectEnemy(myTeam, this.units[targetUnitIndex]))
-         && (this._canHit(unit, this.units[targetUnitIndex]))
-         && (this._isStillAlive(this.units[targetUnitIndex]))){
-            return targetUnitIndex;
+        if ((targetObjectIndex !== undefined)
+         && (this._isObjectEnemy(myTeam, this.shootableObjects[targetObjectIndex]))
+         && (this._canHit(shootableObject, this.shootableObjects[targetObjectIndex]))
+         && (this._isStillAlive(this.shootableObjects[targetObjectIndex]))){
+            return targetObjectIndex;
         }
 
-        if (!unit.canShootOnMove
-            && this._isUnitInMotion(unit)) {
+        if (!shootableObject.canShootOnMove
+            && this._isUnitInMotion(shootableObject)) {
             return undefined;
         }
 
-        for (var i = 0; i < this.units.length; i++) {
-            if (i == unitIndex)
+        for (var i = 0; i < this.shootableObjects.length; i++) {
+            if (i == shootableObjectIndex)
                 continue;
 
-            if ((this._isObjectEnemy(myTeam, this.units[i]))
-             && (this._canHit(unit, this.units[i]))
-             && (this._isStillAlive(this.units[i]))) {
+            if ((this._isObjectEnemy(myTeam, this.shootableObjects[i]))
+             && (this._canHit(shootableObject, this.shootableObjects[i]))
+             && (this._isStillAlive(this.shootableObjects[i]))) {
                 return i;
             }
         }
@@ -83,22 +110,19 @@ UnitStriker.prototype = {
 
     _stopUnitForFire : function (unit, enemyObjectIndex) {
         if (enemyObjectIndex != undefined
-            && unit.targetUnitIndex != undefined
-            && enemyObjectIndex == unit.targetUnitIndex) {
-            //unit.isStopForShot = true;
+            && unit.targetIndex != undefined
+            && enemyObjectIndex == unit.targetIndex) {
             unit.stop();
             return;
         }
-
-        //unit.isStopForShot = false;
     },
 
     _rechargeObjectsGunsRoutine : function(){
-        var units = this.units,
+        var units = this.shootableObjects,
             unit;
 
         for (var i = 0; i < units.length; i++) {
-            unit = this.units[i];
+            unit = this.shootableObjects[i];
 
             if (unit.rechargeGunTimer < unit.rechargeGunTime) {
                 unit.rechargeGunTimer++;
@@ -106,33 +130,33 @@ UnitStriker.prototype = {
         }
     },
 
-    _createGunShell : function(unit, enemyObject, gunShellIndex) {
-        var shotPoint = new Point(unit.renderingX, unit.renderingY),
+    _createGunShell : function(shootableObject, enemyObject, gunShellIndex) {
+        var shotPoint = new Point(shootableObject.renderingX, shootableObject.renderingY),
             targetPoint = new Point(enemyObject.renderingX, enemyObject.renderingY),
-            damage = unit.damage,
-            image = unit.gunShellImage;
+            damage = shootableObject.damage,
+            image = shootableObject.gunShellImage;
         return new GunShell(shotPoint, targetPoint, damage, image, gunShellIndex);
     },
 
-    _objectShot : function (unit, enemyObject) {
+    _objectShot : function (shootableObject, enemyObject) {
         var gunShell,
             gunShellIndex;
 
         if (enemyObject === undefined)
             return;
 
-        if (unit.rechargeGunTimer != unit.rechargeGunTime)
+        if (shootableObject.rechargeGunTimer != shootableObject.rechargeGunTime)
             return;
 
-        unit.rechargeGunTimer = 0;
+        shootableObject.rechargeGunTimer = 0;
         gunShellIndex = this.gunShells.length;
-        gunShell = this._createGunShell(unit, enemyObject, gunShellIndex);
+        gunShell = this._createGunShell(shootableObject, enemyObject, gunShellIndex);
         this.gunShells.push(gunShell);
     },
 
     unitFightRoutine : function () {
-        var units = this.units,
-            unit,
+        var units = this.shootableObjects,
+            shootableObject,
             enemyObjectIndex;
 
         this._rechargeObjectsGunsRoutine();
@@ -140,16 +164,16 @@ UnitStriker.prototype = {
         this.gunShellMover.moveGunShell();
 
         for (var i = 0; i < units.length; i++) {
-            unit = this.units[i];
+            shootableObject = this.shootableObjects[i];
 
-            if (unit.health <= 0)
+            if (shootableObject.health <= 0)
                 continue;
 
             enemyObjectIndex = this._findEnemyInFireRadius(i);
 
-            this._stopUnitForFire(unit, enemyObjectIndex);
+            this._stopUnitForFire(shootableObject, enemyObjectIndex);
 
-            this._objectShot(unit, units[enemyObjectIndex]);
+            this._objectShot(shootableObject, units[enemyObjectIndex]);
         }
     }
 }
