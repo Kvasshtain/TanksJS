@@ -1,12 +1,12 @@
-function GameDrawer(cellWidth, cellHeight, battleMap, units, gunShells, visibleObjects) {
+function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects) {
 
-    if (!(units instanceof Array))
-        throw TypeError("shootableObjects isn't Array");
+    if (!(movableObjects instanceof Array))
+        throw TypeError("movableObjects isn't Array");
 
-    for (var i = 0; i < units.length; i++)
+    for (var i = 0; i < movableObjects.length; i++)
     {
-        if (!(units[i] instanceof Unit))
-            throw TypeError("shootableObjects[i] isn't Unit");
+        if (!(movableObjects[i] instanceof Unit) && !(movableObjects[i] instanceof MovableObject))
+            throw TypeError("movableObject isn't Unit or MovableObject");
     }
 
     if (!(gunShells instanceof Array))
@@ -48,7 +48,7 @@ function GameDrawer(cellWidth, cellHeight, battleMap, units, gunShells, visibleO
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
     this.battleMap = battleMap;
-    this.shootableObjects = units;
+    this.movableObjects = movableObjects;
     this.gunShells = gunShells;
     this.visibleObjects = visibleObjects;
 
@@ -202,13 +202,15 @@ GameDrawer.prototype ={
         if (image === undefined)
             return;
 
-        if (orientation === undefined){
+        if (orientation === undefined
+            ||
+            orientation === NaN){
             this.drawArea.drawImage(image, x, y, width, height);
         }
 
         this.drawArea.save();
         this.drawArea.translate(x + width/2,y + height/2);
-        this.drawArea.rotate(degToRad(orientation));
+        this.drawArea.rotate(orientation);
         this.drawArea.translate(-(x + width/2),-(y + height/2));
         this.drawArea.drawImage(image, x, y, width, height);
         this.drawArea.restore();
@@ -222,22 +224,22 @@ GameDrawer.prototype ={
             y,
             image,
             orientation,
-            unit;
+            movableObject;
 
-        for(var i = 0; i < this.shootableObjects.length; i++){
-            unit = this.shootableObjects[i];
+        for(var i = 0; i < this.movableObjects.length; i++){
+            movableObject = this.movableObjects[i];
 
-            if ((unit.renderingX === undefined) || (unit.renderingY === undefined)) {
-                unit.renderingX = this.cellHeight * unit.currentMapCell.xIndex;
-                unit.renderingY = this.cellWidth * unit.currentMapCell.yIndex;
+            if ((movableObject.renderingX === undefined) || (movableObject.renderingY === undefined)) {
+                movableObject.renderingX = this.cellHeight * movableObject.currentMapCell.xIndex;
+                movableObject.renderingY = this.cellWidth * movableObject.currentMapCell.yIndex;
             }
 
-            x = unit.renderingX;
-            y = unit.renderingY;
+            x = movableObject.renderingX;
+            y = movableObject.renderingY;
 
-            orientation = unit.orientation;
+            orientation = movableObject.orientation;
 
-            image = unit.image;
+            image = movableObject.image;
             this.drawArea.save();
             this.drawArea.translate(x + width/2,y + height/2);
             switch (orientation) {
@@ -307,16 +309,16 @@ GameDrawer.prototype ={
             height = this.cellHeight,
             x,
             y,
-            shootableObject;
+            movableObject;
 
-        for(var i = 0; i < this.shootableObjects.length; i++) {
-            shootableObject = this.shootableObjects[i];
+        for(var i = 0; i < this.movableObjects.length; i++) {
+            movableObject = this.movableObjects[i];
 
-            if (shootableObject.health > 0)
+            if (movableObject.health > 0)
                 continue;
 
-            x = shootableObject.renderingX;
-            y = shootableObject.renderingY;
+            x = movableObject.renderingX;
+            y = movableObject.renderingY;
 
             this.drawArea.drawImage(this.smokeImage, x, y, width, height);
         }

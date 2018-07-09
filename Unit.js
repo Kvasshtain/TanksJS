@@ -1,25 +1,3 @@
-var direction = {
-    up:"up",
-    down:"down",
-    left:"left",
-    right:"right",
-    upRight:"upRight",
-    downRight: "downRight",
-    downLeft: "downLeft",
-    upLeft: "upLeft",
-
-    validate: function (value) {
-        for(var dir in this){
-            if(dir == value) return true;
-        }
-        return false;
-    }
-}
-
-Object.freeze(direction);
-
-//=====================================================================
-
 function Unit(name, currentMapCell, destinationMapCell, orientation, image, team, health, fireRadius) {
 
     if (!direction.validate(orientation))

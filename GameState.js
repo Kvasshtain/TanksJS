@@ -81,7 +81,7 @@ extend(UserSelectUnitState.prototype, {
             return;
         }
 
-        unit = gameProperty.shootableObjects[gameProperty.selectedUnitIndex];
+        unit = gameProperty.mapObjects[gameProperty.selectedUnitIndex];
 
         targetUnitIndex = gameProperty.unitFinder.findByMapCellObjIndex(gameProperty.leftButtonSelectedCell);
 

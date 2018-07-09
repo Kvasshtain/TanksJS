@@ -1,18 +1,23 @@
-function findPathForAllUnits(units, pathFinder) {
-    var unit;
+function findPathForAllMovableObjects(movableObjects, pathFinder) {
+    var movableObject;
 
-    if (!(units instanceof Array) && units !== undefined)
-        throw TypeError("shootableObjects is not Array or undefined");
+    if (!(movableObjects instanceof Array) && movableObjects !== undefined)
+        throw TypeError("movableObjects is not Array or undefined");
+
+    for (var i = 0; i < movableObjects.length; i++) {
+        if (!(movableObjects[i] instanceof MovableObject) && !(movableObjects[i] instanceof Unit))
+            throw TypeError("movableObject isn't MovableObject or Unit");
+    }
 
     if (!(pathFinder instanceof PathFinder))
         throw TypeError("pathFinder is not PathFinder");
 
-    for (var i = 0; i < units.length; i++) {
-        unit = units[i];
+    for (var i = 0; i < movableObjects.length; i++) {
+        movableObject = movableObjects[i];
 
-        if (!MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
-            unit.movementPath = pathFinder.findPath(unit.nextMapCell, unit.destinationMapCell);
-            unit.movementPathStepIndex = 1;
+        if (!MapCell.areEqual(movableObject.currentMapCell, movableObject.destinationMapCell)) {
+            movableObject.movementPath = pathFinder.findPath(movableObject.nextMapCell, movableObject.destinationMapCell);
+            movableObject.movementPathStepIndex = 1;
         }
     }
 }
@@ -24,6 +29,8 @@ function gameRoutine(){
         stoneImage1 = new Image(),
         treeImage1 = new Image(),
         gunImage1 = new Image(),
+        gunImage2 = new Image(),
+        carImage1 = new Image(),
         moveDelay = 10,
 
         unit0 = new Unit("pz3", new MapCell(1, 1), new MapCell(1, 1), "down", tankImage1, "панцерваффе", 40, 500),
@@ -72,10 +79,42 @@ function gameRoutine(){
             gunImage1,
             1),
 
-        shootableObjects = units.concat(gun0),
+        gun1 = new ShootableObject(
+            new MapCell(13,4),
+            false,
+            true,
+            undefined,
+            1,
+            100,
+            500,
+            "pak-40",
+            "панцерваффе",
+            500,
+            1,
+            100,
+            gunImage2,
+            1),
+
+        car0 = new MovableObject(
+            new MapCell(14,9),
+            false,
+            true,
+            carImage1,
+            0.7,
+            100,
+            100,
+            new MapCell(14,9),
+            "up"
+        ),
+
+        shootableObjects = units.concat(gun0, gun1),
 
         visibleObjects = [stone0, stone1, stone2, stone3, stone4, stone5,
-                          tree0, tree1, tree2, tree3, tree4, tree5, gun0],
+                          tree0, tree1, tree2, tree3, tree4, tree5, gun0, gun1],
+
+        movableObjects = units.concat(car0),
+
+        findableObjects = shootableObjects.concat(movableObjects),
 
         gunShells = [],
         cellWidth = 50,
@@ -83,12 +122,12 @@ function gameRoutine(){
         columnNum = 20,
         rowNum = 20,
         battleMap = new BattleMap(columnNum, rowNum),
-        gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, units, gunShells, visibleObjects),
-        unitFinder = new UnitFinder(shootableObjects, cellWidth, cellHeight),
+        gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects),
+        unitFinder = new UnitFinder(findableObjects, cellWidth, cellHeight),
         mapObjectFinder = new MapObjectFinder(visibleObjects, cellWidth, cellHeight),
         pathFinder = new PathFinder(battleMap, unitFinder, mapObjectFinder),
-        unitsMover = new UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight),
-        gameProperty = new GameProperty("0", 0, units, unitFinder, undefined, undefined),
+        unitsMover = new UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, cellHeight),
+        gameProperty = new GameProperty("0", 0, findableObjects, unitFinder, undefined, undefined),
         unitStriker = new UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         unitTracker = new UnitTracker(units, cellWidth, cellHeight),
         gameTimer = new GameTimer();
@@ -97,7 +136,9 @@ function gameRoutine(){
     tankImage2.src = 't34-42.png';
     stoneImage1.src = 'stone1.png';
     treeImage1.src = 'spruce_tree1.png';
-    gunImage1.src = 'zis-3.png'
+    gunImage1.src = 'zis-3.png';
+    gunImage2.src = 'pak-40.png',
+    carImage1.src = 'car.png';
 
     function getChar(event) {
         gameProperty.currentKey = event.which;
@@ -136,7 +177,7 @@ function gameRoutine(){
         gameDrawer.drawMap();
         gameProperty.gameState.handleUserAction(gameProperty);
 
-        findPathForAllUnits(units, pathFinder);
+        findPathForAllMovableObjects(movableObjects, pathFinder);
 
         unitStriker.unitFightRoutine();
         unitsMover.moveUnits();

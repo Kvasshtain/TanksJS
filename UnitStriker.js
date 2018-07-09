@@ -64,6 +64,10 @@ UnitStriker.prototype = {
     },
 
     _isObjectEnemy : function (myTeam, unit) {
+
+        if (unit === undefined || unit.team === undefined)
+            return false;
+
         return myTeam !== unit.team;
     },
 
@@ -108,10 +112,20 @@ UnitStriker.prototype = {
         return undefined;
     },
 
+    _turnToTheEnemy : function (shootableObject, enemyObject) {
+        var shootableObjectX = shootableObject.currentMapCell.xIndex * this.cellWidth,
+            shootableObjectY = shootableObject.currentMapCell.yIndex * this.cellHeight,
+            enemyObjectX = enemyObject.currentMapCell.xIndex * this.cellWidth,
+            enemyObjectY = enemyObject.currentMapCell.yIndex * this.cellHeight;
+
+        shootableObject.turretOrientation = Math.atan2(shootableObjectY - enemyObjectY, shootableObjectX - enemyObjectX);
+    },
+
     _stopUnitForFire : function (unit, enemyObjectIndex) {
         if (enemyObjectIndex != undefined
             && unit.targetIndex != undefined
-            && enemyObjectIndex == unit.targetIndex) {
+            && enemyObjectIndex == unit.targetIndex
+            && unit.stop) {
             unit.stop();
             return;
         }
@@ -147,6 +161,8 @@ UnitStriker.prototype = {
 
         if (shootableObject.rechargeGunTimer != shootableObject.rechargeGunTime)
             return;
+
+        this._turnToTheEnemy(shootableObject, enemyObject);
 
         shootableObject.rechargeGunTimer = 0;
         gunShellIndex = this.gunShells.length;

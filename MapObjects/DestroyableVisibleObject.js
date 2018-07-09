@@ -1,4 +1,11 @@
-function DestroyableVisibleObject(currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize, health, disappearanceAfterDeathCount) {
+function DestroyableVisibleObject(
+    currentMapCell,
+    isPassable,
+    isGunShellPenetrable,
+    image,
+    relativeSize,
+    health,
+    disappearanceAfterDeathCount) {
 
     if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");

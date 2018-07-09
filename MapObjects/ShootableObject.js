@@ -50,7 +50,15 @@ function ShootableObject(
     if ("number" != typeof relativeTurretSize)
         throw TypeError("relativeTurretSize isn't number");
 
-    DestroyableVisibleObject.call(this, currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize, health, disappearanceAfterDeathCount);
+    DestroyableVisibleObject.call(
+        this,
+        currentMapCell,
+        isPassable,
+        isGunShellPenetrable,
+        image,
+        relativeSize,
+        health,
+        disappearanceAfterDeathCount);
 
     this.name = name;
     this.team = team;

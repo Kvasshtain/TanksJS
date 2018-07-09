@@ -1,11 +1,11 @@
-function UnitFinder(shootableObjects, cellWidth, cellHeight){
+function UnitFinder(findableObjects, cellWidth, cellHeight){
 
-    if (!(shootableObjects instanceof Array) && !(shootableObjects instanceof Object))
+    if (!(findableObjects instanceof Array) && !(findableObjects instanceof Object))
         throw TypeError("This is not Array or Object");
 
-    for (var i = 0; i < shootableObjects.length; i++){
-        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
-            throw TypeError("This is not ShootableObject");
+    for (var i = 0; i < findableObjects.length; i++){
+        if (findableObjects[i].currentMapCell === undefined)
+            throw TypeError("findableObjects doesn't have property currentMapCell");
     }
 
     if (cellWidth === undefined)
@@ -20,7 +20,7 @@ function UnitFinder(shootableObjects, cellWidth, cellHeight){
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.shootableObjects = shootableObjects;
+    this.findableObjects = findableObjects;
     this.unitHalfWidth = cellWidth / 2;
     this.unitHalfHeight = cellHeight / 2;
 }
@@ -33,11 +33,11 @@ UnitFinder.prototype = {
         if (!(mapCell instanceof MapCell))
             throw TypeError("This is not MapCell");
 
-        for (var unitIndex = 0; unitIndex < this.shootableObjects.length; unitIndex++){
+        for (var unitIndex = 0; unitIndex < this.findableObjects.length; unitIndex++){
 
-            if (MapCell.areEqual(this.shootableObjects[unitIndex].currentMapCell, mapCell)
+            if (MapCell.areEqual(this.findableObjects[unitIndex].currentMapCell, mapCell)
                 ||
-                MapCell.areEqual(this.shootableObjects[unitIndex].nextMapCell, mapCell)) {
+                MapCell.areEqual(this.findableObjects[unitIndex].nextMapCell, mapCell)) {
                 return unitIndex;
             }
         }
@@ -52,9 +52,9 @@ UnitFinder.prototype = {
         if (!point instanceof Point)
             throw TypeError("point isn't Point");
 
-        for (var unitIndex = 0; unitIndex < this.shootableObjects.length; unitIndex++){
-            unitX = this.shootableObjects[unitIndex].renderingX;
-            unitY = this.shootableObjects[unitIndex].renderingY;
+        for (var unitIndex = 0; unitIndex < this.findableObjects.length; unitIndex++){
+            unitX = this.findableObjects[unitIndex].renderingX;
+            unitY = this.findableObjects[unitIndex].renderingY;
 
             if (((unitX - this.unitHalfWidth < point.x) && (point.x < unitX + this.unitHalfWidth))
                 &&

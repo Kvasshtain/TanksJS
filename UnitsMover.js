@@ -1,4 +1,12 @@
-function UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight){
+function UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, cellHeight){
+
+    if (!(movableObjects instanceof Array) && !(movableObjects instanceof Object))
+        throw TypeError("movableObjects isn't Array or Object");
+
+    for (var i = 0; i < movableObjects.length; i++) {
+        if (!(movableObjects[i] instanceof MovableObject) && !(movableObjects[i] instanceof Unit))
+            throw TypeError("movableObject isn't MovableObject or Unit");
+    }
 
     if (!(units instanceof Array) && !(units instanceof Object))
         throw TypeError("This is not Array or Object");
@@ -26,7 +34,7 @@ function UnitsMover(units, pathFinder, unitFinder, cellWidth, cellHeight){
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.shootableObjects = units;
+    this.movableObjects = movableObjects.concat(units);
     this.pathFinder = pathFinder;
     this.unitFinder = unitFinder;
     this.cellWidth = cellWidth;
@@ -37,10 +45,10 @@ UnitsMover.prototype = {
     constructor : UnitsMover,
 
     moveUnits : function () {
-        var length = this.shootableObjects.length;
+        var length = this.movableObjects.length;
 
         for (var unitIndex = 0; unitIndex < length; unitIndex++) {
-            var unit = this.shootableObjects[unitIndex];
+            var unit = this.movableObjects[unitIndex];
 
             if (unit.health <= 0)
                 continue;
@@ -92,47 +100,47 @@ UnitsMover.prototype = {
     _moveUnitsBetweenCells : function (i) {
         var orientation;
 
-        if (MapCell.areEqual(this.shootableObjects[i].currentMapCell, this.shootableObjects[i].nextMapCell)) {
+        if (MapCell.areEqual(this.movableObjects[i].currentMapCell, this.movableObjects[i].nextMapCell)) {
             return;
         }
 
-        orientation = this.shootableObjects[i].orientation;
+        orientation = this.movableObjects[i].orientation;
 
         switch (orientation) {
             case "up":
-                this.shootableObjects[i].renderingY--;
+                this.movableObjects[i].renderingY--;
                 break;
             case "down":
-                this.shootableObjects[i].renderingY++;
+                this.movableObjects[i].renderingY++;
                 break;
             case "left":
-                this.shootableObjects[i].renderingX--;
+                this.movableObjects[i].renderingX--;
                 break;
             case "right":
-                this.shootableObjects[i].renderingX++;
+                this.movableObjects[i].renderingX++;
                 break;
             case "upRight":
-                this.shootableObjects[i].renderingX++;
-                this.shootableObjects[i].renderingY--;
+                this.movableObjects[i].renderingX++;
+                this.movableObjects[i].renderingY--;
                 break;
             case "downRight":
-                this.shootableObjects[i].renderingX++;
-                this.shootableObjects[i].renderingY++;
+                this.movableObjects[i].renderingX++;
+                this.movableObjects[i].renderingY++;
                 break;
             case "downLeft":
-                this.shootableObjects[i].renderingX--;
-                this.shootableObjects[i].renderingY++;
+                this.movableObjects[i].renderingX--;
+                this.movableObjects[i].renderingY++;
                 break;
             case "upLeft":
-                this.shootableObjects[i].renderingX--;
-                this.shootableObjects[i].renderingY--;
+                this.movableObjects[i].renderingX--;
+                this.movableObjects[i].renderingY--;
                 break;
         }
 
-        if ((this.cellWidth * this.shootableObjects[i].nextMapCell.xIndex == this.shootableObjects[i].renderingX)
-            && (this.cellHeight * this.shootableObjects[i].nextMapCell.yIndex == this.shootableObjects[i].renderingY)){
-            this.shootableObjects[i].currentMapCell.xIndex = this.shootableObjects[i].nextMapCell.xIndex;
-            this.shootableObjects[i].currentMapCell.yIndex = this.shootableObjects[i].nextMapCell.yIndex
+        if ((this.cellWidth * this.movableObjects[i].nextMapCell.xIndex == this.movableObjects[i].renderingX)
+            && (this.cellHeight * this.movableObjects[i].nextMapCell.yIndex == this.movableObjects[i].renderingY)){
+            this.movableObjects[i].currentMapCell.xIndex = this.movableObjects[i].nextMapCell.xIndex;
+            this.movableObjects[i].currentMapCell.yIndex = this.movableObjects[i].nextMapCell.yIndex
         }
     }
 }
