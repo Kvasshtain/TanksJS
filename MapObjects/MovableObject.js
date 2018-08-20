@@ -13,6 +13,31 @@ var direction = {
             if(dir == value) return true;
         }
         return false;
+    },
+
+    defineOrientationFromDirection: function (currentDirection) {
+
+    if (!direction.validate(currentDirection))
+        throw TypeError("currentDirection is not direction");
+
+        switch (currentDirection) {
+            case "up":
+                return -Math.PI / 2.0;
+            case "down":
+                return Math.PI / 2.0;
+            case "left":
+                return Math.PI;
+            case "right":
+                return 0;
+            case "upRight":
+                return -Math.PI / 4.0;
+            case "downRight":
+                return Math.PI / 4.0;
+            case "downLeft":
+                return 3 * Math.PI / 4.0;
+            case "upLeft":
+                return 3 * -Math.PI / 4.0;
+        }
     }
 }
 
@@ -29,7 +54,7 @@ function MovableObject(
     health,
     disappearanceAfterDeathCount,
     destinationMapCell,
-    orientation) {
+    currentDirection) {
 
     if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
@@ -55,7 +80,7 @@ function MovableObject(
     if (!destinationMapCell instanceof MapCell && destinationMapCell != undefined)
         throw new TypeError("destinationMapCell is not MapCell or undefined");
 
-    if (!direction.validate(orientation))
+    if (!direction.validate(currentDirection))
         throw TypeError("currentDirection is not direction");
 
     DestroyableVisibleObject.call(
@@ -70,7 +95,7 @@ function MovableObject(
 
     this.nextMapCell = currentMapCell;
     this.destinationMapCell = destinationMapCell;
-    this.orientation = orientation;
+    this.currentDirection = currentDirection;
     this.movementPath = undefined;
     this.movementPathStepIndex = 0;
     this.renderingX = undefined;

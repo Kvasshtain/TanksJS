@@ -29,6 +29,10 @@ function extend(o, p) {
 
 //=====================================================================
 
+function union(o,p) { return extend(extend({},o), p); }
+
+//=====================================================================
+
 function isInteger(num) {
     return (num ^ 0) === num;
 }

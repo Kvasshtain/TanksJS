@@ -5,7 +5,11 @@ function GunShellMover(gunShells, shootableObjects, unitFinder, mapObjectFinder,
         throw TypeError("shootableObjects isn't Array or undefined");
 
     for (var i = 0; i < shootableObjects.length; i++){
-        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
+        if (!(shootableObjects[i] instanceof Unit)
+            &&
+            !(shootableObjects[i] instanceof ShootableObject)
+            &&
+            !(shootableObjects[i] instanceof ShootableMovableObject))
             throw TypeError("This is not ShootableObject");
     }
 
