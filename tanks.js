@@ -28,6 +28,7 @@ function gameRoutine(){
         tankImage2 = new Image(),
         tankImage3 = new Image(),
         tankTurretImage3 = new Image(),
+        tankTurretImage4 = new Image(),
         stoneImage1 = new Image(),
         treeImage1 = new Image(),
         gunImage1 = new Image(),
@@ -48,6 +49,24 @@ function gameRoutine(){
         unit9 = new Unit("t34-42", new MapCell(4, 17), new MapCell(4, 17), "up", tankImage2, "РККА", 40, 500),
         unit10 = new Unit("t34-42", new MapCell(5, 17), new MapCell(5, 17), "up", tankImage2, "РККА", 40, 500),
         unit11 = new Unit("t34-42", new MapCell(6, 17), new MapCell(6, 17), "up", tankImage2, "РККА", 40, 500),
+
+        unit11 = new ShootableMovableObject(
+            new MapCell(6, 17),
+            false,
+            true,
+            tankImage2,
+            1,
+            500,
+            100,
+            "t34-42",
+            "РККА",
+            500,
+            5,
+            100,
+            tankTurretImage4,
+            1.3,
+            new MapCell(6, 17),
+            "up"),
 
         unit12 = new ShootableMovableObject(
             new MapCell(7,1),
@@ -156,6 +175,7 @@ function gameRoutine(){
     tankImage2.src = 't34-42.png';
     tankImage3.src = 'Pz-5-Panther.png';
     tankTurretImage3.src = 'Pz-5-Panther_turret.png';
+    tankTurretImage4.src = 't34-42_turret.png';
     stoneImage1.src = 'stone1.png';
     treeImage1.src = 'spruce_tree1.png';
     gunImage1.src = 'zis-3.png';
