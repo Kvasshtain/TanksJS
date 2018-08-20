@@ -4,7 +4,11 @@ function UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, c
         throw TypeError("shootableObjects isn't Array or undefined");
 
     for (var i = 0; i < shootableObjects.length; i++){
-        if (!(shootableObjects[i] instanceof Unit) && !(shootableObjects[i] instanceof ShootableObject))
+        if (!(shootableObjects[i] instanceof Unit)
+            &&
+            !(shootableObjects[i] instanceof ShootableObject)
+            &&
+            !(shootableObjects[i] instanceof ShootableMovableObject))
             throw TypeError("This is not ShootableObject");
     }
 
@@ -118,7 +122,7 @@ UnitStriker.prototype = {
             enemyObjectX = enemyObject.currentMapCell.xIndex * this.cellWidth,
             enemyObjectY = enemyObject.currentMapCell.yIndex * this.cellHeight;
 
-        shootableObject.turretOrientation = Math.atan2(shootableObjectY - enemyObjectY, shootableObjectX - enemyObjectX);
+        shootableObject.turretOrientation = Math.atan2(enemyObjectY - shootableObjectY, enemyObjectX - shootableObjectX);
     },
 
     _stopUnitForFire : function (unit, enemyObjectIndex) {

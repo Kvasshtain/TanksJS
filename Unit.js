@@ -1,6 +1,6 @@
-function Unit(name, currentMapCell, destinationMapCell, orientation, image, team, health, fireRadius) {
+function Unit(name, currentMapCell, destinationMapCell, currentDirection, image, team, health, fireRadius) {
 
-    if (!direction.validate(orientation))
+    if (!direction.validate(currentDirection))
         throw TypeError("currentDirection is not direction");
 
     if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
@@ -22,7 +22,7 @@ function Unit(name, currentMapCell, destinationMapCell, orientation, image, team
     this.currentMapCell = currentMapCell;
     this.nextMapCell = currentMapCell;
     this.destinationMapCell = destinationMapCell;
-    this.orientation = orientation;
+    this.currentDirection = currentDirection;
     this.image = image;
     this.gunShellImage = new Image();
     this.gunShellImage.src = 'redGunShell.png';

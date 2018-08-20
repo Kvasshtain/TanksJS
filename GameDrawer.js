@@ -165,7 +165,20 @@ GameDrawer.prototype ={
             x,
             y,
             image,
-            orientation;
+            orientation,
+            renderingX,
+            renderingY,
+            xOffset,
+            yOffset;
+
+        if ((visibleObject.renderingX === undefined) || (visibleObject.renderingY === undefined)) {
+            renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
+            renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
+        }
+        else {
+            renderingX = visibleObject.renderingX;
+            renderingY = visibleObject.renderingY;
+        }
 
         if (visibleObject.relativeSize !== undefined) {
             width = this.cellWidth * visibleObject.relativeTurretSize;
@@ -176,13 +189,16 @@ GameDrawer.prototype ={
             height = this.cellHeight;
         }
 
-        x = this.cellHeight * visibleObject.currentMapCell.xIndex;
-        y = this.cellWidth * visibleObject.currentMapCell.yIndex;
+        xOffset = this.cellWidth / 2 - width / 2;
+        yOffset = this.cellHeight / 2 - height / 2;
 
-        orientation = visibleObject.turretOrientation;
+        x = renderingX + xOffset;
+        y = renderingY + yOffset;
+
+        currentDirection = visibleObject.turretOrientation;
         image = visibleObject.turretImage;
 
-        this._drawImageOnMap(x, y, width, height, orientation, image);
+        this._drawImageOnMap(x, y, width, height, currentDirection, image);
     },
 
     _drawImageOnMap: function(x, y, width, height, orientation, image) {
@@ -202,15 +218,15 @@ GameDrawer.prototype ={
         if (image === undefined)
             return;
 
-        if (orientation === undefined
+        if (currentDirection === undefined
             ||
-            orientation === NaN){
+            currentDirection === NaN){
             this.drawArea.drawImage(image, x, y, width, height);
         }
 
         this.drawArea.save();
         this.drawArea.translate(x + width/2,y + height/2);
-        this.drawArea.rotate(orientation);
+        this.drawArea.rotate(currentDirection);
         this.drawArea.translate(-(x + width/2),-(y + height/2));
         this.drawArea.drawImage(image, x, y, width, height);
         this.drawArea.restore();
@@ -218,12 +234,14 @@ GameDrawer.prototype ={
 
     drawUnits: function () {
 
-        var width = this.cellWidth,
-            height = this.cellHeight,
+        var width,
+            height,
+            xOffset,
+            yOffset,
             x,
             y,
             image,
-            orientation,
+            currentDirection,
             movableObject;
 
         for(var i = 0; i < this.movableObjects.length; i++){
@@ -234,15 +252,27 @@ GameDrawer.prototype ={
                 movableObject.renderingY = this.cellWidth * movableObject.currentMapCell.yIndex;
             }
 
-            x = movableObject.renderingX;
-            y = movableObject.renderingY;
+            if (movableObject.relativeSize !== undefined) {
+                width = this.cellWidth * movableObject.relativeSize;
+                height = this.cellHeight * movableObject.relativeSize;
+            }
+            else {
+                width = this.cellWidth;
+                height = this.cellHeight;
+            }
 
-            orientation = movableObject.orientation;
+            xOffset = this.cellWidth / 2 - width / 2;
+            yOffset = this.cellHeight / 2 - height / 2;
+
+            x = movableObject.renderingX + xOffset;
+            y = movableObject.renderingY + yOffset;
+
+            currentDirection = movableObject.currentDirection;
 
             image = movableObject.image;
             this.drawArea.save();
             this.drawArea.translate(x + width/2,y + height/2);
-            switch (orientation) {
+            switch (currentDirection) {
                 case "up":
                     this.drawArea.rotate(-Math.PI / 2.0);
                     break;
@@ -268,6 +298,9 @@ GameDrawer.prototype ={
             this.drawArea.translate(-(x + width/2),-(y + height/2));
             this.drawArea.drawImage(image, x, y, width, height);
             this.drawArea.restore();
+
+            if (movableObject.turretImage !== undefined)
+                this._drawTurret(movableObject);
 
             //this._drawUnitHealth(x, y, unit.health);
         }

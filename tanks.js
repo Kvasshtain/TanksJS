@@ -26,6 +26,8 @@ function gameRoutine(){
 
     var tankImage1 = new Image(),
         tankImage2 = new Image(),
+        tankImage3 = new Image(),
+        tankTurretImage3 = new Image(),
         stoneImage1 = new Image(),
         treeImage1 = new Image(),
         gunImage1 = new Image(),
@@ -47,7 +49,25 @@ function gameRoutine(){
         unit10 = new Unit("t34-42", new MapCell(5, 17), new MapCell(5, 17), "up", tankImage2, "РККА", 40, 500),
         unit11 = new Unit("t34-42", new MapCell(6, 17), new MapCell(6, 17), "up", tankImage2, "РККА", 40, 500),
 
-        units = [unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10, unit11],
+        unit12 = new ShootableMovableObject(
+            new MapCell(7,1),
+            false,
+            true,
+            tankImage3,
+            1.3,
+            1000,
+            100,
+            "Pz-5-Panther",
+            "панцерваффе",
+            1000,
+            10,
+            100,
+            tankTurretImage3,
+            2,
+            new MapCell(7,1),
+            "down"),
+
+        units = [unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10, unit11, unit12],
 
         stone0 = new VisibleObject(new MapCell(1, 8), false, false, stoneImage1, 1),
         stone1 = new VisibleObject(new MapCell(2, 8), false, false, stoneImage1, 1),
@@ -126,7 +146,7 @@ function gameRoutine(){
         unitFinder = new UnitFinder(findableObjects, cellWidth, cellHeight),
         mapObjectFinder = new MapObjectFinder(visibleObjects, cellWidth, cellHeight),
         pathFinder = new PathFinder(battleMap, unitFinder, mapObjectFinder),
-        unitsMover = new UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, cellHeight),
+        unitsMover = new UnitsMover(movableObjects.concat(units), pathFinder, unitFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, findableObjects, unitFinder, undefined, undefined),
         unitStriker = new UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         unitTracker = new UnitTracker(units, cellWidth, cellHeight),
@@ -134,6 +154,8 @@ function gameRoutine(){
 
     tankImage1.src = 'Pz-3.png';
     tankImage2.src = 't34-42.png';
+    tankImage3.src = 'Pz-5-Panther.png';
+    tankTurretImage3.src = 'Pz-5-Panther_turret.png';
     stoneImage1.src = 'stone1.png';
     treeImage1.src = 'spruce_tree1.png';
     gunImage1.src = 'zis-3.png';

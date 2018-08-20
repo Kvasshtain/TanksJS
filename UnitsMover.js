@@ -1,4 +1,4 @@
-function UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, cellHeight){
+function UnitsMover(movableObjects, pathFinder, unitFinder, cellWidth, cellHeight){
 
     if (!(movableObjects instanceof Array) && !(movableObjects instanceof Object))
         throw TypeError("movableObjects isn't Array or Object");
@@ -6,14 +6,6 @@ function UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, ce
     for (var i = 0; i < movableObjects.length; i++) {
         if (!(movableObjects[i] instanceof MovableObject) && !(movableObjects[i] instanceof Unit))
             throw TypeError("movableObject isn't MovableObject or Unit");
-    }
-
-    if (!(units instanceof Array) && !(units instanceof Object))
-        throw TypeError("This is not Array or Object");
-
-    for (var i = 0; i < units.length; i++) {
-        if (!(units[i] instanceof Unit))
-            throw TypeError("This is not Unit");
     }
 
     if (!(pathFinder instanceof PathFinder))
@@ -34,7 +26,7 @@ function UnitsMover(movableObjects, units, pathFinder, unitFinder, cellWidth, ce
     if (cellHeight <= 0)
         throw RangeError("cellHeight <= 0");
 
-    this.movableObjects = movableObjects.concat(units);
+    this.movableObjects = movableObjects;
     this.pathFinder = pathFinder;
     this.unitFinder = unitFinder;
     this.cellWidth = cellWidth;
@@ -92,21 +84,23 @@ UnitsMover.prototype = {
             nextCell = unit.movementPath[unit.movementPathStepIndex];
         }
 
-        unit.orientation = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
+        unit.currentDirection = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
+
+        unit.turretOrientation = direction.defineOrientationFromDirection(unit.currentDirection);
 
         unit.nextMapCell = nextCell;
     },
 
     _moveUnitsBetweenCells : function (i) {
-        var orientation;
+        var currentDirection;
 
         if (MapCell.areEqual(this.movableObjects[i].currentMapCell, this.movableObjects[i].nextMapCell)) {
             return;
         }
 
-        orientation = this.movableObjects[i].orientation;
+        currentDirection = this.movableObjects[i].currentDirection;
 
-        switch (orientation) {
+        switch (currentDirection) {
             case "up":
                 this.movableObjects[i].renderingY--;
                 break;
