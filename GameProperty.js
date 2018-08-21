@@ -1,4 +1,4 @@
-function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, leftButtonSelectedCell, rightButtonSelectedCell){
+function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, leftButtonSelectedCell, rightButtonSelectedCell, gamerTeam){
 
     if (!isInteger(selectedUnitIndex))
         throw TypeError("shootableObjects isn't integer");
@@ -15,6 +15,9 @@ function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, lef
     if (!(rightButtonSelectedCell instanceof MapCell) && rightButtonSelectedCell != undefined)
         throw TypeError("rightButtonSelectedCell is not MapCell");
 
+    if (gamerTeam === undefined)
+        throw TypeError("gamerTeam is undefined");
+
     this.currentKey = currentKey;
     this.leftButtonSelectedCell = leftButtonSelectedCell;
     this.rightButtonSelectedCell = rightButtonSelectedCell;
@@ -22,6 +25,7 @@ function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, lef
     this.mapObjects = mapObjects;
     this.unitFinder = unitFinder;
     this.gameState = new InitialState();
+    this.gamerTeam = gamerTeam;
 }
 
 GameProperty.prototype = {

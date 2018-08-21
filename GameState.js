@@ -85,6 +85,12 @@ extend(UserSelectUnitState.prototype, {
 
         targetUnitIndex = gameProperty.unitFinder.findByMapCellObjIndex(gameProperty.leftButtonSelectedCell);
 
+        if (unit.team !== gameProperty.gamerTeam){
+            gameProperty.leftButtonSelectedCell = undefined;
+            gameProperty.gameState = new InitialState();
+            return;
+        }
+
         if (targetUnitIndex !== undefined) {
 
             unit.targetIndex = targetUnitIndex;

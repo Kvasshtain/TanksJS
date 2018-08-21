@@ -64,5 +64,9 @@ UnitFinder.prototype = {
         }
 
         return undefined;
+    },
+
+    getGameObjectByIndex : function (index) {
+        return this.findableObjects[index];
     }
 }
