@@ -165,7 +165,7 @@ function gameRoutine(){
         unitFinder = new UnitFinder(findableObjects, cellWidth, cellHeight),
         mapObjectFinder = new MapObjectFinder(visibleObjects, cellWidth, cellHeight),
         pathFinder = new PathFinder(battleMap, unitFinder, mapObjectFinder),
-        unitsMover = new UnitsMover(movableObjects.concat(units), pathFinder, unitFinder, cellWidth, cellHeight),
+        unitsMover = new UnitsMover(movableObjects.concat(units), pathFinder, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, findableObjects, unitFinder, undefined, undefined, "панцерваффе"),
         unitStriker = new UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         unitTracker = new UnitTracker(units, cellWidth, cellHeight),

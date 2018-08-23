@@ -1,4 +1,4 @@
-function UnitsMover(movableObjects, pathFinder, unitFinder, cellWidth, cellHeight){
+function UnitsMover(movableObjects, pathFinder, unitFinder, mapObjectFinder, cellWidth, cellHeight){
 
     if (!(movableObjects instanceof Array) && !(movableObjects instanceof Object))
         throw TypeError("movableObjects isn't Array or Object");
@@ -13,6 +13,9 @@ function UnitsMover(movableObjects, pathFinder, unitFinder, cellWidth, cellHeigh
 
     if (!(unitFinder instanceof UnitFinder))
         throw TypeError("This is not UnitFinder");
+
+    if (!(mapObjectFinder instanceof MapObjectFinder))
+        throw TypeError("This is not MapObjectFinder");
 
     if (cellWidth === undefined)
         throw TypeError("cellWidth === undefined");
@@ -29,6 +32,7 @@ function UnitsMover(movableObjects, pathFinder, unitFinder, cellWidth, cellHeigh
     this.movableObjects = movableObjects;
     this.pathFinder = pathFinder;
     this.unitFinder = unitFinder;
+    this.mapObjectFinder = mapObjectFinder;
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
 }
@@ -92,49 +96,55 @@ UnitsMover.prototype = {
     },
 
     _moveUnitsBetweenCells : function (i) {
-        var currentDirection;
+        var currentDirection,
+            movableObject = this.movableObjects[i];
 
-        if (MapCell.areEqual(this.movableObjects[i].currentMapCell, this.movableObjects[i].nextMapCell)) {
+        if (MapCell.areEqual(movableObject.currentMapCell, movableObject.nextMapCell)) {
             return;
         }
 
-        currentDirection = this.movableObjects[i].currentDirection;
+        if (this.mapObjectFinder.findByMapCellImpassableObjIndex(movableObject.nextMapCell) !== undefined) {
+            MovableObject.Stop(movableObject);
+            return;
+        }
+
+        currentDirection = movableObject.currentDirection;
 
         switch (currentDirection) {
             case "up":
-                this.movableObjects[i].renderingY--;
+                movableObject.renderingY--;
                 break;
             case "down":
-                this.movableObjects[i].renderingY++;
+                movableObject.renderingY++;
                 break;
             case "left":
                 this.movableObjects[i].renderingX--;
                 break;
             case "right":
-                this.movableObjects[i].renderingX++;
+                movableObject.renderingX++;
                 break;
             case "upRight":
-                this.movableObjects[i].renderingX++;
-                this.movableObjects[i].renderingY--;
+                movableObject.renderingX++;
+                movableObject.renderingY--;
                 break;
             case "downRight":
-                this.movableObjects[i].renderingX++;
-                this.movableObjects[i].renderingY++;
+                movableObject.renderingX++;
+                movableObject.renderingY++;
                 break;
             case "downLeft":
-                this.movableObjects[i].renderingX--;
-                this.movableObjects[i].renderingY++;
+                movableObject.renderingX--;
+                movableObject.renderingY++;
                 break;
             case "upLeft":
-                this.movableObjects[i].renderingX--;
-                this.movableObjects[i].renderingY--;
+                movableObject.renderingX--;
+                movableObject.renderingY--;
                 break;
         }
 
-        if ((this.cellWidth * this.movableObjects[i].nextMapCell.xIndex == this.movableObjects[i].renderingX)
-            && (this.cellHeight * this.movableObjects[i].nextMapCell.yIndex == this.movableObjects[i].renderingY)){
-            this.movableObjects[i].currentMapCell.xIndex = this.movableObjects[i].nextMapCell.xIndex;
-            this.movableObjects[i].currentMapCell.yIndex = this.movableObjects[i].nextMapCell.yIndex
+        if ((this.cellWidth * movableObject.nextMapCell.xIndex == movableObject.renderingX)
+            && (this.cellHeight * movableObject.nextMapCell.yIndex == movableObject.renderingY)){
+            movableObject.currentMapCell.xIndex = movableObject.nextMapCell.xIndex;
+            movableObject.currentMapCell.yIndex = movableObject.nextMapCell.yIndex
         }
     }
 }
