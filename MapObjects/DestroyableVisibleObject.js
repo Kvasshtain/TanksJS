@@ -31,6 +31,7 @@ function DestroyableVisibleObject(
     VisibleObject.call(this, currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize);
 
     this.health = health;
+    this.maxHealth = health;
     this.disappearanceAfterDeathCount = disappearanceAfterDeathCount;
 }
 

@@ -37,11 +37,15 @@ UnitTracker.prototype = {
         for (var i = 0; i < this.shootableObjects.length; i++) {
             unit = this.shootableObjects[i];
 
-            if (unit.targetIndex === undefined) {
+            if (!unit.targetIndex) {
                 continue;
             }
 
             targetUnit = this.shootableObjects[unit.targetIndex];
+
+            if (!targetUnit){
+                continue;
+            }
 
             if (targetUnit.health <= 0) {
                 unit.targetIndex = undefined;

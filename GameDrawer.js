@@ -1,4 +1,4 @@
-function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects) {
+function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects, gameProperty) {
 
     if (!(movableObjects instanceof Array))
         throw TypeError("movableObjects isn't Array");
@@ -45,12 +45,16 @@ function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells,
     if (!isFinite(cellHeight))
         throw RangeError("cellHeight is not finite");
 
+    if (!(gameProperty instanceof GameProperty))
+        throw TypeError("gameProperty isn't GameProperty");
+
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
     this.battleMap = battleMap;
     this.movableObjects = movableObjects;
     this.gunShells = gunShells;
     this.visibleObjects = visibleObjects;
+    this.gameProperty = gameProperty;
 
     var canvas,
         body,
@@ -87,17 +91,26 @@ GameDrawer.prototype ={
         var width = this.cellWidth,
             height = this.cellHeight;
 
-        this.drawArea.fillStyle = "green";
-
         for(var i = 0; i < this.battleMap.rowNum; i++) {
             for (var j = 0; j < this.battleMap.columnNum; j++) {
 
                 y = this.cellHeight * i;
                 x = this.cellWidth * j;
-
+                this.drawArea.fillStyle = "black";
                 this.drawArea.fillRect(x, y, width, height);
+
+                this.drawArea.fillStyle = "green";
+                this.drawArea.fillRect(x + 1, y + 1, width - 2, height - 2);
+
+                this._drawCellCoordinates(x + width/3, y + height/2, j + ':' + i);
             }
         }
+    },
+
+    _drawCellCoordinates: function (x, y, coordinates) {
+        this.drawArea.font = "10px Georgia";
+        this.drawArea.fillStyle = "black";
+        this.drawArea.fillText(coordinates, x, y);
     },
 
     drawVisibleObjects : function () {
@@ -112,6 +125,8 @@ GameDrawer.prototype ={
             height,
             x,
             y,
+            cellX,
+            cellY,
             xOffset,
             yOffset,
             image,
@@ -240,6 +255,8 @@ GameDrawer.prototype ={
             yOffset,
             x,
             y,
+            cellX,
+            cellY,
             image,
             currentDirection,
             movableObject;
@@ -264,8 +281,11 @@ GameDrawer.prototype ={
             xOffset = this.cellWidth / 2 - width / 2;
             yOffset = this.cellHeight / 2 - height / 2;
 
-            x = movableObject.renderingX + xOffset;
-            y = movableObject.renderingY + yOffset;
+            cellX = movableObject.renderingX;
+            cellY = movableObject.renderingY;
+
+            x = cellX + xOffset;
+            y = cellY + yOffset;
 
             currentDirection = movableObject.currentDirection;
 
@@ -302,17 +322,34 @@ GameDrawer.prototype ={
             if (movableObject.turretImage !== undefined)
                 this._drawTurret(movableObject);
 
-            //this._drawUnitHealth(x, y, unit.health);
+            if (this.gameProperty.currentHighlightedUnitIndex == i) {
+                this._drawUnitHealth(cellX, cellY, movableObject.health, movableObject.maxHealth);
+            }
         }
     },
 
-    _drawUnitHealth : function (x, y, health) {
+    _drawUnitHealth : function (x, y, health, maxHealth) {
         var width = this.cellWidth,
-            height = this.cellHeight;
+            height = this.cellHeight,
+            healthRibbonWidth = health * width / maxHealth,
+            healthRibbonHeight = height / 20;
 
-        this.drawArea.font = "5px Georgia";
-        this.drawArea.fillStyle = "fuchsia";
-        this.drawArea.fillText(health, x, y);
+        // this.drawArea.font = "5px Georgia";
+        // this.drawArea.fillStyle = "fuchsia";
+        // this.drawArea.fillText(health, x, y);
+
+        this.drawArea.fillStyle = "black";
+        this.drawArea.fillRect(x, y, width, healthRibbonHeight);
+
+        this.drawArea.fillStyle = "#99ff33";
+
+        if (health / maxHealth < 0.5)
+            this.drawArea.fillStyle = "Yellow";
+
+        if (health / maxHealth < 0.25)
+            this.drawArea.fillStyle = "Red";
+
+        this.drawArea.fillRect(x, y, healthRibbonWidth, healthRibbonHeight);
     },
 
     drawGunShell : function () {

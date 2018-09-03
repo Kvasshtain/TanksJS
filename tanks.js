@@ -340,14 +340,14 @@ function gameRoutine(){
             1),
 
         car0 = new MovableObject(
-            new MapCell(14,9),
+            new MapCell(15,10),
             false,
             true,
             carImage1,
             0.7,
             100,
             100,
-            new MapCell(14,9),
+            new MapCell(19,19),
             "up"
         ),
 
@@ -366,12 +366,12 @@ function gameRoutine(){
         columnNum = 20,
         rowNum = 20,
         battleMap = new BattleMap(columnNum, rowNum),
-        gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects),
         unitFinder = new UnitFinder(findableObjects, cellWidth, cellHeight),
         mapObjectFinder = new MapObjectFinder(visibleObjects, cellWidth, cellHeight),
         pathFinder = new PathFinder(battleMap, unitFinder, mapObjectFinder),
         unitsMover = new UnitsMover(movableObjects.concat(units), pathFinder, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         gameProperty = new GameProperty("0", 0, findableObjects, unitFinder, undefined, undefined, "панцерваффе"),
+        gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects, gameProperty),
         unitStriker = new UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         unitTracker = new UnitTracker(units, cellWidth, cellHeight),
         gameTimer = new GameTimer();

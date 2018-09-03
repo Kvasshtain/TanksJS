@@ -29,5 +29,6 @@ function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, lef
 }
 
 GameProperty.prototype = {
-    constructor : GameProperty
+    constructor : GameProperty,
+    currentHighlightedUnitIndex : undefined
 }

@@ -19,7 +19,7 @@ extend(InitialState.prototype, {
     constructor : InitialState,
     handleUserAction : function (gameProperty) {
         if (!(gameProperty instanceof GameProperty))
-            throw TypeError("gameProperty is not GameProperty");
+            throw TypeError("gameProperty isn't GameProperty");
 
         if (gameProperty.leftButtonSelectedCell === undefined)
             return;
@@ -47,11 +47,13 @@ extend(UserSelectCellState.prototype, {
         gameProperty.selectedUnitIndex = gameProperty.unitFinder.findByMapCellObjIndex(gameProperty.leftButtonSelectedCell);
 
         if (gameProperty.selectedUnitIndex !== undefined){
+            gameProperty.currentHighlightedUnitIndex = gameProperty.selectedUnitIndex;
             gameProperty.gameState = new UserSelectUnitState();
             gameProperty.leftButtonSelectedCell = undefined;
             return;
         }
 
+        gameProperty.currentHighlightedUnitIndex = undefined;
         gameProperty.gameState = new InitialState();
         gameProperty.leftButtonSelectedCell = undefined;
         return;
