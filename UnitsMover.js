@@ -3,11 +3,6 @@ function UnitsMover(movableObjects, pathFinder, unitFinder, mapObjectFinder, cel
     if (!(movableObjects instanceof Array) && !(movableObjects instanceof Object))
         throw TypeError("movableObjects isn't Array or Object");
 
-    for (var i = 0; i < movableObjects.length; i++) {
-        if (!(movableObjects[i] instanceof MovableObject) && !(movableObjects[i] instanceof Unit))
-            throw TypeError("movableObject isn't MovableObject or Unit");
-    }
-
     if (!(pathFinder instanceof PathFinder))
         throw TypeError("This is not PathFinder");
 
@@ -17,11 +12,11 @@ function UnitsMover(movableObjects, pathFinder, unitFinder, mapObjectFinder, cel
     if (!(mapObjectFinder instanceof MapObjectFinder))
         throw TypeError("This is not MapObjectFinder");
 
-    if (cellWidth === undefined)
-        throw TypeError("cellWidth === undefined");
+    if (!cellWidth)
+        throw TypeError("cellWidth is undefined");
 
-    if (cellHeight === undefined)
-        throw TypeError("cellHeight === undefined");
+    if (!cellHeight)
+        throw TypeError("cellHeight is undefined");
 
     if (cellWidth <= 0)
         throw RangeError("cellWidth <= 0");
@@ -45,6 +40,9 @@ UnitsMover.prototype = {
 
         for (var unitIndex = 0; unitIndex < length; unitIndex++) {
             var unit = this.movableObjects[unitIndex];
+
+            if (!(unit instanceof MovableObject))
+                continue;
 
             if (unit.health <= 0)
                 continue;
@@ -103,42 +101,40 @@ UnitsMover.prototype = {
             return;
         }
 
-        if (this.mapObjectFinder.findByMapCellImpassableObjIndex(movableObject.nextMapCell) !== undefined) {
-            MovableObject.Stop(movableObject);
-            return;
-        }
+        if(movableObject.currentDirection) {
 
-        currentDirection = movableObject.currentDirection;
+            currentDirection = movableObject.currentDirection;
 
-        switch (currentDirection) {
-            case "up":
-                movableObject.renderingY--;
-                break;
-            case "down":
-                movableObject.renderingY++;
-                break;
-            case "left":
-                this.movableObjects[i].renderingX--;
-                break;
-            case "right":
-                movableObject.renderingX++;
-                break;
-            case "upRight":
-                movableObject.renderingX++;
-                movableObject.renderingY--;
-                break;
-            case "downRight":
-                movableObject.renderingX++;
-                movableObject.renderingY++;
-                break;
-            case "downLeft":
-                movableObject.renderingX--;
-                movableObject.renderingY++;
-                break;
-            case "upLeft":
-                movableObject.renderingX--;
-                movableObject.renderingY--;
-                break;
+            switch (currentDirection) {
+                case "up":
+                    movableObject.renderingY--;
+                    break;
+                case "down":
+                    movableObject.renderingY++;
+                    break;
+                case "left":
+                    this.movableObjects[i].renderingX--;
+                    break;
+                case "right":
+                    movableObject.renderingX++;
+                    break;
+                case "upRight":
+                    movableObject.renderingX++;
+                    movableObject.renderingY--;
+                    break;
+                case "downRight":
+                    movableObject.renderingX++;
+                    movableObject.renderingY++;
+                    break;
+                case "downLeft":
+                    movableObject.renderingX--;
+                    movableObject.renderingY++;
+                    break;
+                case "upLeft":
+                    movableObject.renderingX--;
+                    movableObject.renderingY--;
+                    break;
+            }
         }
 
         if ((this.cellWidth * movableObject.nextMapCell.xIndex == movableObject.renderingX)

@@ -1,16 +1,16 @@
 function GunShell(shotPoint, targetPoint, damage, image, gunShellIndex) {
     var xFlightDistance, yFlightDistance, xFlightDistancePow2, yFlightDistancePow2;
 
-    if (!shotPoint instanceof Point)
+    if (!(shotPoint instanceof Point))
         throw TypeError("shotPoint isn't Point");
 
-    if (!targetPoint instanceof Point)
+    if (!(targetPoint instanceof Point))
         throw TypeError("targetPoint isn't Point");
 
     if ("number" != typeof(damage))
         throw TypeError("damage isn't number");
 
-    if (!image instanceof Image)
+    if (!(image instanceof Image))
         throw TypeError("image isn't Image");
 
     if (!isInteger(gunShellIndex))

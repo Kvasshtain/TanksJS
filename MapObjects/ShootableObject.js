@@ -14,7 +14,7 @@ function ShootableObject(
     turretImage,
     relativeTurretSize) {
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -22,9 +22,6 @@ function ShootableObject(
 
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
-
-    if (!image instanceof Image)
-        throw TypeError("image isn't Image");
 
     if ("number" != typeof relativeSize)
         throw TypeError("relativeSize isn't number");
@@ -44,7 +41,7 @@ function ShootableObject(
     if (!isInteger(rechargeGunTime))
         throw TypeError("rechargeGunTime isn't integer");
 
-    if (!turretImage instanceof Image)
+    if (!(turretImage instanceof Image))
         throw new TypeError("turretImage isn't Image");
 
     if ("number" != typeof relativeTurretSize)

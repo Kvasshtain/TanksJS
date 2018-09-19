@@ -15,10 +15,10 @@ Point.prototype = {
 
 Point.areEqual = function (firstPoint, secondPoint) {
 
-    if (!firstPoint instanceof Point)
+    if (!(firstPoint instanceof Point))
         throw new TypeError("firstPoint is not Point");
 
-    if (!secondPoint instanceof Point)
+    if (!(secondPoint instanceof Point))
         throw new TypeError("secondPoint is not Point");
 
     if ((firstPoint.x == secondPoint.x) && (firstPoint.y == secondPoint.y)){

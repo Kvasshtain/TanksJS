@@ -45,18 +45,34 @@ UnitFinder.prototype = {
         return undefined;
     },
 
+    _isObjectUnit : function (mapObject) {
+        return (mapObject instanceof MovableObject
+                ||
+                mapObject instanceof ShootableObject
+                ||
+                mapObject instanceof ShootableMovableObject)
+    },
+
     findByCoordinatesObjIndex : function (point) {
-        var unitX,
+        var unit,
+            unitX,
             unitY;
 
-        if (!point instanceof Point)
+        if (!(point instanceof Point))
             throw TypeError("point isn't Point");
 
         for (var unitIndex = 0; unitIndex < this.findableObjects.length; unitIndex++){
-            unitX = this.findableObjects[unitIndex].renderingX;
-            unitY = this.findableObjects[unitIndex].renderingY;
+            unit = this.findableObjects[unitIndex];
+            unitX = unit.renderingX;
+            unitY = unit.renderingY;
 
-            if (((unitX - this.unitHalfWidth < point.x) && (point.x < unitX + this.unitHalfWidth))
+            if (!unit)
+                continue;
+
+            if (!this._isObjectUnit(unit))
+                continue;
+
+            if (((unitX - this.unitHalfWidth < point.x)  && (point.x < unitX + this.unitHalfWidth))
                 &&
                 ((unitY - this.unitHalfHeight < point.y) && (point.y < unitY + this.unitHalfHeight))) {
                 return unitIndex;

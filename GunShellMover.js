@@ -4,15 +4,6 @@ function GunShellMover(gunShells, shootableObjects, unitFinder, mapObjectFinder,
     if (!(shootableObjects instanceof Array) && shootableObjects !== undefined)
         throw TypeError("shootableObjects isn't Array or undefined");
 
-    for (var i = 0; i < shootableObjects.length; i++){
-        if (!(shootableObjects[i] instanceof Unit)
-            &&
-            !(shootableObjects[i] instanceof ShootableObject)
-            &&
-            !(shootableObjects[i] instanceof ShootableMovableObject))
-            throw TypeError("This is not ShootableObject");
-    }
-
     if (!(gunShells instanceof Array) && gunShells !== undefined)
         throw TypeError("gunShells isn't Array or undefined");
 
@@ -94,14 +85,18 @@ GunShellMover.prototype = {
 
     _makeDamage : function (gunShellIndex) {
         var gunShell = this.gunShells[gunShellIndex],
-            unitIndex = this.unitFinder.findByCoordinatesObjIndex(gunShell.targetPoint);
+            unitIndex = this.unitFinder.findByCoordinatesObjIndex(gunShell.targetPoint),
+            shootableObjects = this.shootableObjects;
 
         if (unitIndex === undefined)
             return;
 
-        if (this.shootableObjects[unitIndex].health == 0)
+        if (!shootableObjects[unitIndex])
             return;
 
-        this.shootableObjects[unitIndex].health -= gunShell.damage;
+        if (shootableObjects[unitIndex].health == 0)
+            return;
+
+        shootableObjects[unitIndex].health -= gunShell.damage;
     }
 }

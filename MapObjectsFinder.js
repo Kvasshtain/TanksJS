@@ -8,11 +8,11 @@ function MapObjectFinder(gameObjects, cellWidth, cellHeight){
             throw TypeError("This is not GameObject");
     }
 
-    if (cellWidth === undefined)
-        throw TypeError("cellWidth === undefined");
+    if (!cellWidth)
+        throw TypeError("cellWidth is undefined");
 
-    if (cellHeight === undefined)
-        throw TypeError("cellHeight === undefined");
+    if (!cellHeight)
+        throw TypeError("cellHeight is undefined");
 
     if (cellWidth <= 0)
         throw RangeError("cellWidth <= 0");
@@ -30,16 +30,30 @@ function MapObjectFinder(gameObjects, cellWidth, cellHeight){
 MapObjectFinder.prototype = {
     constructor : MapObjectFinder,
 
+    _isObjectMapObject : function (mapObject) {
+        return (mapObject instanceof GameObject
+                ||
+                mapObject.currentMapCell)
+    },
+
     findByMapCellObjIndex : function (mapCell) {
+
+        var mapObject,
+            currentMapCell,
+            nextMapCell;
 
         if (!(mapCell instanceof MapCell))
             throw TypeError("This is not MapCell");
 
         for (var objectIndex = 0; objectIndex < this.gameObjects.length; objectIndex++){
 
-            if (MapCell.areEqual(this.gameObjects[objectIndex].currentMapCell, mapCell)
+            mapObject = this.gameObjects[objectIndex];
+            currentMapCell = mapObject.currentMapCell;
+            nextMapCell = mapObject.nextMapCell;
+
+            if (MapCell.areEqual(currentMapCell, mapCell)
                 ||
-                MapCell.areEqual(this.gameObjects[objectIndex].nextMapCell, mapCell)) {
+                MapCell.areEqual(nextMapCell, mapCell)) {
                 return objectIndex;
             }
         }
@@ -54,10 +68,10 @@ MapObjectFinder.prototype = {
 
         var objectIndex = this.findByMapCellObjIndex(mapCell);
 
-        if (objectIndex === undefined)
+        if (!objectIndex)
             return undefined;
 
-        if (this.gameObjects[objectIndex].isPassable == true)
+        if (this.gameObjects[objectIndex].isPassable)
             return undefined;
 
         return objectIndex;
@@ -65,7 +79,7 @@ MapObjectFinder.prototype = {
 
     findByCoordinatesObjIndex : function (point) {
 
-        if (!point instanceof Point)
+        if (!(point instanceof Point))
             throw TypeError("point isn't Point");
 
         var gameObjectX,
@@ -77,10 +91,10 @@ MapObjectFinder.prototype = {
             gameObjectX = gameObject.renderingX;
             gameObjectY = gameObject.renderingY;
 
-            if (gameObjectX === undefined)
+            if (!gameObjectX)
                 gameObjectX = this.cellHeight * gameObject.currentMapCell.xIndex;
 
-            if (gameObjectY === undefined)
+            if (!gameObjectY)
                 gameObjectY = this.cellWidth * gameObject.currentMapCell.yIndex;
 
             if (((gameObjectX - this.gameObjectHalfWidth < point.x) && (point.x < gameObjectX + this.gameObjectHalfWidth))
@@ -95,12 +109,12 @@ MapObjectFinder.prototype = {
 
     findByCoordinatesGunShellImpenetrableObjIndex : function (point) {
 
-        if (!point instanceof Point)
+        if (!(point instanceof Point))
             throw TypeError("point isn't Point");
 
         var objectIndex = this.findByCoordinatesObjIndex(point);
 
-        if (objectIndex === undefined)
+        if (!objectIndex)
             return undefined;
 
         if (this.gameObjects[objectIndex].isGunShellPenetrable)

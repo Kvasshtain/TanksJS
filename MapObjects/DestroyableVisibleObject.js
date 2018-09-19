@@ -7,7 +7,7 @@ function DestroyableVisibleObject(
     health,
     disappearanceAfterDeathCount) {
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -15,9 +15,6 @@ function DestroyableVisibleObject(
 
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
-
-    if (!image instanceof Image)
-        throw TypeError("image isn't Image");
 
     if ("number" != typeof relativeSize)
         throw TypeError("relativeSize isn't number");

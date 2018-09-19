@@ -56,7 +56,7 @@ function MovableObject(
     destinationMapCell,
     currentDirection) {
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -65,7 +65,7 @@ function MovableObject(
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if (!image instanceof Image)
+    if (!(image instanceof Image))
         throw TypeError("image isn't Image");
 
     if ("number" != typeof relativeSize)
@@ -77,7 +77,7 @@ function MovableObject(
     if (!isInteger(disappearanceAfterDeathCount))
         throw TypeError("disappearanceAfterDeathCount isn't integer");
 
-    if (!destinationMapCell instanceof MapCell && destinationMapCell != undefined)
+    if (!(destinationMapCell instanceof MapCell) && destinationMapCell != undefined)
         throw new TypeError("destinationMapCell is not MapCell or undefined");
 
     if (!direction.validate(currentDirection))
@@ -107,7 +107,7 @@ MovableObject.prototype.constructor = MovableObject;
 
 MovableObject.Stop = function (movableObject) {
 
-    if (!movableObject instanceof MovableObject)
+    if (!(movableObject instanceof MovableObject))
         throw TypeError("movableObject isn't MovableObject");
 
     movableObject.destinationMapCell = movableObject.nextMapCell = movableObject.currentMapCell;

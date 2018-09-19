@@ -1,6 +1,6 @@
 function MapBlock(mapCell, isPassable) {
 
-    if (!mapCell instanceof MapCell)
+    if (!(mapCell instanceof MapCell))
         throw new TypeError("currentMapCell is not MapCell");
 
     if ((typeof isPassable) != "boolean")

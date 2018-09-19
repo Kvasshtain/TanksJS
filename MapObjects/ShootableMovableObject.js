@@ -16,7 +16,7 @@ function ShootableMovableObject(
     destinationMapCell,
     currentDirection
 ) {
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -25,7 +25,7 @@ function ShootableMovableObject(
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if (!image instanceof Image)
+    if (!(image instanceof Image))
         throw TypeError("image isn't Image");
 
     if ("number" != typeof relativeSize)
@@ -46,13 +46,13 @@ function ShootableMovableObject(
     if (!isInteger(rechargeGunTime))
         throw TypeError("rechargeGunTime isn't integer");
 
-    if (!turretImage instanceof Image)
+    if (!(turretImage instanceof Image))
         throw new TypeError("turretImage isn't Image");
 
     if ("number" != typeof relativeTurretSize)
         throw TypeError("relativeTurretSize isn't number");
 
-    if (!destinationMapCell instanceof MapCell && destinationMapCell != undefined)
+    if (!(destinationMapCell instanceof MapCell) && destinationMapCell != undefined)
         throw new TypeError("destinationMapCell is not MapCell or undefined");
 
     if (!direction.validate(currentDirection))
@@ -90,3 +90,8 @@ function ShootableMovableObject(
 
 ShootableMovableObject.prototype = inherit(MovableObject.prototype);
 ShootableMovableObject.prototype.constructor = ShootableMovableObject;
+ShootableMovableObject.prototype.stop = function () {
+    this.destinationMapCell = this.nextMapCell;
+    this.movementPath = undefined;
+    this.movementPathStepIndex = 0;
+};

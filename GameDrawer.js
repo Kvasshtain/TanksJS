@@ -1,13 +1,4 @@
-function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells, visibleObjects, gameProperty) {
-
-    if (!(movableObjects instanceof Array))
-        throw TypeError("movableObjects isn't Array");
-
-    for (var i = 0; i < movableObjects.length; i++)
-    {
-        if (!(movableObjects[i] instanceof Unit) && !(movableObjects[i] instanceof MovableObject))
-            throw TypeError("movableObject isn't Unit or MovableObject");
-    }
+function GameDrawer(cellWidth, cellHeight, battleMap, gunShells, visibleObjects, gameProperty) {
 
     if (!(gunShells instanceof Array))
         throw TypeError("gunShells isn't Array");
@@ -21,11 +12,11 @@ function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells,
     if (!(battleMap instanceof BattleMap))
         throw TypeError("battleMap isn't BattleMap");
 
-    if (cellWidth === undefined)
-        throw TypeError("cellWidth === undefined");
+    if (!cellWidth)
+        throw TypeError("cellWidth is undefined");
 
-    if (cellHeight === undefined)
-        throw TypeError("cellHeight === undefined");
+    if (!cellHeight)
+        throw TypeError("cellHeight is undefined");
 
     if ("number" !== typeof cellWidth)
         throw TypeError("cellWidth isn't number");
@@ -51,7 +42,6 @@ function GameDrawer(cellWidth, cellHeight, battleMap, movableObjects, gunShells,
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
     this.battleMap = battleMap;
-    this.movableObjects = movableObjects;
     this.gunShells = gunShells;
     this.visibleObjects = visibleObjects;
     this.gameProperty = gameProperty;
@@ -115,61 +105,117 @@ GameDrawer.prototype ={
 
     drawVisibleObjects : function () {
 
-        if(this.visibleObjects === undefined)
+        var width,
+            height,
+            xOffset,
+            yOffset,
+            x,
+            y,
+            cellX,
+            cellY,
+            image,
+            currentDirection,
+            health,
+            maxHealth,
+            visibleObject;
+
+        if(!this.visibleObjects)
             return;
 
         if(!(this.visibleObjects instanceof Array))
             return;
 
-        var width,
-            height,
-            x,
-            y,
-            cellX,
-            cellY,
-            xOffset,
-            yOffset,
-            image,
-            visibleObject;
-
-        for(var i = 0; i < this.visibleObjects.length; i++){
+        for(var i = 0; i < this.visibleObjects.length; i++) {
             visibleObject = this.visibleObjects[i];
 
-            if (visibleObject.currentMapCell === undefined)
+            if (!visibleObject.currentMapCell)
                 continue;
 
-            if (visibleObject.image !== undefined)
-            {
-                if (visibleObject.relativeSize !== undefined) {
-                    width = this.cellWidth * visibleObject.relativeSize;
-                    height = this.cellHeight * visibleObject.relativeSize;
-                }
-                else {
-                    width = this.cellWidth;
-                    height = this.cellHeight;
-                }
+            if (!visibleObject.renderingX || !visibleObject.renderingY) {
+                visibleObject.renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
+                visibleObject.renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
+            }
 
-                xOffset = this.cellWidth / 2 - width / 2;
-                yOffset = this.cellHeight / 2 - height / 2;
+            if (visibleObject.relativeSize) {
+                width = this.cellWidth * visibleObject.relativeSize;
+                height = this.cellHeight * visibleObject.relativeSize;
+            }
+            else {
+                width = this.cellWidth;
+                height = this.cellHeight;
+            }
 
-                x = this.cellHeight * visibleObject.currentMapCell.xIndex + xOffset;
-                y = this.cellWidth * visibleObject.currentMapCell.yIndex + yOffset;
+            xOffset = this.cellWidth / 2 - width / 2;
+            yOffset = this.cellHeight / 2 - height / 2;
+
+            cellX = visibleObject.renderingX;
+            cellY = visibleObject.renderingY;
+
+            x = cellX + xOffset;
+            y = cellY + yOffset;
+
+            if (visibleObject.image) {
+                currentDirection = visibleObject.currentDirection;
 
                 image = visibleObject.image;
 
-                this.drawArea.drawImage(image, x, y, width, height);
+                if (currentDirection) {
+                    this._rotateAndDrawImage(image, x, y, width, height, currentDirection)
+                }
+                else {
+                    this.drawArea.drawImage(image, x, y, width, height);
+                }
             }
 
-            if (visibleObject.turretImage !== undefined)
+            if (visibleObject.turretImage)
                 this._drawTurret(visibleObject);
+
+            health = visibleObject.health;
+            maxHealth = visibleObject.maxHealth;
+
+            if ((this.gameProperty.currentHighlightedUnitIndex == i) && health && maxHealth) {
+                this._drawHealth(cellX, cellY, health, maxHealth);
+            }
         }
     },
 
+    _rotateAndDrawImage : function (image, x, y, width, height, currentDirection) {
+
+        this.drawArea.save();
+        this.drawArea.translate(x + width/2,y + height/2);
+        switch (currentDirection) {
+            case "up":
+                this.drawArea.rotate(-Math.PI / 2.0);
+                break;
+            case "down":
+                this.drawArea.rotate(Math.PI / 2.0);
+                break;
+            case "left":
+                this.drawArea.rotate(Math.PI);
+                break;
+            case "upRight":
+                this.drawArea.rotate(-Math.PI / 4.0);
+                break;
+            case "downRight":
+                this.drawArea.rotate(Math.PI / 4.0);
+                break;
+            case "downLeft":
+                this.drawArea.rotate(3 * Math.PI / 4.0);
+                break;
+            case "upLeft":
+                this.drawArea.rotate(3 * -Math.PI / 4.0);
+                break;
+        }
+        this.drawArea.translate(-(x + width/2),-(y + height/2));
+        this.drawArea.drawImage(image, x, y, width, height);
+        this.drawArea.restore();
+    },
+
     _drawTurret : function (visibleObject) {
-        if(visibleObject === undefined)
+        if(!visibleObject)
             return;
 
-        if(visibleObject.turretImage === undefined)
+        if(!visibleObject.turretImage)
             return;
 
         if(visibleObject.turretOrientation === undefined)
@@ -186,7 +232,7 @@ GameDrawer.prototype ={
             xOffset,
             yOffset;
 
-        if ((visibleObject.renderingX === undefined) || (visibleObject.renderingY === undefined)) {
+        if (!visibleObject.renderingX || !visibleObject.renderingY) {
             renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
             renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
         }
@@ -195,7 +241,7 @@ GameDrawer.prototype ={
             renderingY = visibleObject.renderingY;
         }
 
-        if (visibleObject.relativeSize !== undefined) {
+        if (visibleObject.relativeSize) {
             width = this.cellWidth * visibleObject.relativeTurretSize;
             height = this.cellHeight * visibleObject.relativeTurretSize;
         }
@@ -210,125 +256,44 @@ GameDrawer.prototype ={
         x = renderingX + xOffset;
         y = renderingY + yOffset;
 
-        currentDirection = visibleObject.turretOrientation;
+        orientation = visibleObject.turretOrientation;
         image = visibleObject.turretImage;
 
-        this._drawImageOnMap(x, y, width, height, currentDirection, image);
+        this._drawImageOnMap(x, y, width, height, orientation, image);
     },
 
     _drawImageOnMap: function(x, y, width, height, orientation, image) {
 
-        if (x === undefined)
+        if (!x)
             return;
 
-        if (y === undefined)
+        if (!y)
             return;
 
-        if (width === undefined)
+        if (!width)
             return;
 
-        if (height === undefined)
+        if (!height)
             return;
 
-        if (image === undefined)
+        if (!image)
             return;
 
-        if (currentDirection === undefined
+        if (!orientation
             ||
-            currentDirection === NaN){
+            isNaN(orientation)){
             this.drawArea.drawImage(image, x, y, width, height);
         }
 
         this.drawArea.save();
         this.drawArea.translate(x + width/2,y + height/2);
-        this.drawArea.rotate(currentDirection);
+        this.drawArea.rotate(orientation);
         this.drawArea.translate(-(x + width/2),-(y + height/2));
         this.drawArea.drawImage(image, x, y, width, height);
         this.drawArea.restore();
     },
 
-    drawUnits: function () {
-
-        var width,
-            height,
-            xOffset,
-            yOffset,
-            x,
-            y,
-            cellX,
-            cellY,
-            image,
-            currentDirection,
-            movableObject;
-
-        for(var i = 0; i < this.movableObjects.length; i++){
-            movableObject = this.movableObjects[i];
-
-            if ((movableObject.renderingX === undefined) || (movableObject.renderingY === undefined)) {
-                movableObject.renderingX = this.cellHeight * movableObject.currentMapCell.xIndex;
-                movableObject.renderingY = this.cellWidth * movableObject.currentMapCell.yIndex;
-            }
-
-            if (movableObject.relativeSize !== undefined) {
-                width = this.cellWidth * movableObject.relativeSize;
-                height = this.cellHeight * movableObject.relativeSize;
-            }
-            else {
-                width = this.cellWidth;
-                height = this.cellHeight;
-            }
-
-            xOffset = this.cellWidth / 2 - width / 2;
-            yOffset = this.cellHeight / 2 - height / 2;
-
-            cellX = movableObject.renderingX;
-            cellY = movableObject.renderingY;
-
-            x = cellX + xOffset;
-            y = cellY + yOffset;
-
-            currentDirection = movableObject.currentDirection;
-
-            image = movableObject.image;
-            this.drawArea.save();
-            this.drawArea.translate(x + width/2,y + height/2);
-            switch (currentDirection) {
-                case "up":
-                    this.drawArea.rotate(-Math.PI / 2.0);
-                    break;
-                case "down":
-                    this.drawArea.rotate(Math.PI / 2.0);
-                    break;
-                case "left":
-                    this.drawArea.rotate(Math.PI);
-                    break;
-                case "upRight":
-                    this.drawArea.rotate(-Math.PI / 4.0);
-                    break;
-                case "downRight":
-                    this.drawArea.rotate(Math.PI / 4.0);
-                    break;
-                case "downLeft":
-                    this.drawArea.rotate(3 * Math.PI / 4.0);
-                    break;
-                case "upLeft":
-                    this.drawArea.rotate(3 * -Math.PI / 4.0);
-                    break;
-            }
-            this.drawArea.translate(-(x + width/2),-(y + height/2));
-            this.drawArea.drawImage(image, x, y, width, height);
-            this.drawArea.restore();
-
-            if (movableObject.turretImage !== undefined)
-                this._drawTurret(movableObject);
-
-            if (this.gameProperty.currentHighlightedUnitIndex == i) {
-                this._drawUnitHealth(cellX, cellY, movableObject.health, movableObject.maxHealth);
-            }
-        }
-    },
-
-    _drawUnitHealth : function (x, y, health, maxHealth) {
+    _drawHealth : function (x, y, health, maxHealth) {
         var width = this.cellWidth,
             height = this.cellHeight,
             healthRibbonWidth = health * width / maxHealth,
@@ -367,7 +332,7 @@ GameDrawer.prototype ={
             image = gunShell.image;
             x = gunShell.currentPoint.x + this.cellWidth / 2 - width / 2;
             y = gunShell.currentPoint.y + this.cellHeight / 2 - height / 2;
-            if (x === undefined || y === undefined) {
+            if (!x || !y) {
                 continue;
             }
             this.drawArea.drawImage(image, x, y, width, height);
@@ -379,16 +344,19 @@ GameDrawer.prototype ={
             height = this.cellHeight,
             x,
             y,
-            movableObject;
+            visibleObjects;
 
-        for(var i = 0; i < this.movableObjects.length; i++) {
-            movableObject = this.movableObjects[i];
+        for(var i = 0; i < this.visibleObjects.length; i++) {
+            visibleObjects = this.visibleObjects[i];
 
-            if (movableObject.health > 0)
+            if(visibleObjects.health === undefined)
                 continue;
 
-            x = movableObject.renderingX;
-            y = movableObject.renderingY;
+            if (visibleObjects.health > 0)
+                continue;
+
+            x = visibleObjects.renderingX;
+            y = visibleObjects.renderingY;
 
             this.drawArea.drawImage(this.smokeImage, x, y, width, height);
         }

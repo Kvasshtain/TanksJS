@@ -3,13 +3,13 @@ function Unit(name, currentMapCell, destinationMapCell, currentDirection, image,
     if (!direction.validate(currentDirection))
         throw TypeError("currentDirection is not direction");
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell is not MapCell");
 
-    if (!destinationMapCell instanceof MapCell && destinationMapCell != undefined)
+    if (!(destinationMapCell instanceof MapCell) && destinationMapCell != undefined)
         throw new TypeError("destinationMapCell is not MapCell or undefined");
 
-    if (!image instanceof Image)
+    if (!(image instanceof Image))
         throw TypeError("image is not Image");
 
     if (!isInteger(health))

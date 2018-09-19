@@ -3,15 +3,6 @@ function UnitStriker(shootableObjects, gunShells, unitFinder, mapObjectFinder, c
     if (!(shootableObjects instanceof Array) && shootableObjects !== undefined)
         throw TypeError("shootableObjects isn't Array or undefined");
 
-    for (var i = 0; i < shootableObjects.length; i++){
-        if (!(shootableObjects[i] instanceof Unit)
-            &&
-            !(shootableObjects[i] instanceof ShootableObject)
-            &&
-            !(shootableObjects[i] instanceof ShootableMovableObject))
-            throw TypeError("This is not ShootableObject");
-    }
-
     if (!(gunShells instanceof Array) && gunShells !== undefined)
         throw TypeError("gunShells isn't Array or undefined");
 
@@ -126,9 +117,9 @@ UnitStriker.prototype = {
     },
 
     _stopUnitForFire : function (unit, enemyObjectIndex) {
-        if (enemyObjectIndex != undefined
-            && unit.targetIndex != undefined
-            && enemyObjectIndex == unit.targetIndex
+        if (enemyObjectIndex !== undefined
+            && unit.targetIndex !== undefined
+            && enemyObjectIndex === unit.targetIndex
             && unit.stop) {
             unit.stop();
             return;

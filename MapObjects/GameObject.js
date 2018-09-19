@@ -3,7 +3,7 @@ function GameObject(currentMapCell, isPassable, isGunShellPenetrable){
     if (this.constructor === GameObject)
         throw Error("Can't instantiate abstract class!");
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isnэt MapCell");
 
     if ("boolean" != typeof isPassable)

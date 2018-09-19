@@ -44,11 +44,11 @@ MapCell.prototype = {
 
 MapCell.areEqual = function (firstCell, secondCell) {
 
-    if (!firstCell instanceof MapCell)
-        throw new TypeError("firstCell is not MapCell");
+    if (!(firstCell instanceof MapCell))
+        return false;
 
     if (!secondCell instanceof MapCell)
-        throw new TypeError("secondCell is not MapCell");
+        return false;
 
     if (firstCell === undefined)
         return false;

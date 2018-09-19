@@ -1,6 +1,6 @@
 function VisibleObject(currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize) {
 
-    if (!currentMapCell instanceof MapCell && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -8,9 +8,6 @@ function VisibleObject(currentMapCell, isPassable, isGunShellPenetrable, image, 
 
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
-
-    if (!image instanceof Image)
-            throw TypeError("image isn't Image");
 
     if ("number" != typeof relativeSize)
         throw TypeError("relativeSize isn't number");
