@@ -25,7 +25,7 @@ function Unit(name, currentMapCell, destinationMapCell, currentDirection, image,
     this.currentDirection = currentDirection;
     this.image = image;
     this.gunShellImage = new Image();
-    this.gunShellImage.src = 'redGunShell.png';
+    this.gunShellImage.src = 'Pictures/redGunShell.png';
     this.renderingX = undefined;
     this.renderingY = undefined;
     this.movementPath = undefined;

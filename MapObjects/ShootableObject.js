@@ -65,7 +65,7 @@ function ShootableObject(
     this.turretImage = turretImage;
     this.turretOrientation = 0;
     this.gunShellImage = new Image();
-    this.gunShellImage.src = 'redGunShell.png';
+    this.gunShellImage.src = 'Pictures/redGunShell.png';
     this.targetIndex = undefined;
     this.rechargeGunTimer = this.rechargeGunTime;
     this.relativeTurretSize = relativeTurretSize;

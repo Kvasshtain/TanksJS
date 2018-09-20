@@ -70,7 +70,7 @@ function GameDrawer(cellWidth, cellHeight, battleMap, gunShells, visibleObjects,
     this.drawArea = canvas.getContext("2d");
 
     this.smokeImage = new Image();
-    this.smokeImage.src = 'smoke.png';
+    this.smokeImage.src = 'Pictures/smoke.png';
 }
 
 GameDrawer.prototype ={
@@ -139,14 +139,26 @@ GameDrawer.prototype ={
             if (visibleObject.relativeSize) {
                 width = this.cellWidth * visibleObject.relativeSize;
                 height = this.cellHeight * visibleObject.relativeSize;
+
+                xOffset = this.cellWidth / 2 - width / 2;
+                yOffset = this.cellHeight / 2 - height / 2;
+            }
+            else if (visibleObject instanceof CompositeObject) {
+                width = this.cellWidth * visibleObject.xSize;
+                height = this.cellHeight * visibleObject.ySize;
+
+                xOffset = 0;
+                yOffset = 0;
             }
             else {
                 width = this.cellWidth;
                 height = this.cellHeight;
+
+                xOffset = 0;
+                yOffset = 0;
             }
 
-            xOffset = this.cellWidth / 2 - width / 2;
-            yOffset = this.cellHeight / 2 - height / 2;
+
 
             cellX = visibleObject.renderingX;
             cellY = visibleObject.renderingY;

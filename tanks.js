@@ -4,11 +4,6 @@ function findPathForAllMovableObjects(movableObjects, pathFinder) {
     if (!(movableObjects instanceof Array) && movableObjects !== undefined)
         throw TypeError("movableObjects is not Array or undefined");
 
-    // for (var i = 0; i < movableObjects.length; i++) {
-    //     if (!(movableObjects[i] instanceof MovableObject) && !(movableObjects[i] instanceof Unit))
-    //         throw TypeError("movableObject isn't MovableObject or Unit");
-    // }
-
     if (!(pathFinder instanceof PathFinder))
         throw TypeError("pathFinder is not PathFinder");
 
@@ -43,6 +38,9 @@ function gameRoutine(){
         gunImage1 = new Image(),
         gunImage2 = new Image(),
         carImage1 = new Image(),
+        houseImage = new Image(),
+        houseImage2 = new Image(),
+
         moveDelay = 10,
 
         unit0 = new ShootableMovableObject(
@@ -353,8 +351,26 @@ function gameRoutine(){
             0.7,
             100,
             100,
-            new MapCell(19,19),
+            new MapCell(7,12),
             "up"
+        ),
+
+        house = new CompositeObject(
+            new MapCell(5,11),
+            false,
+            false,
+            houseImage,
+            2,
+            2
+        ),
+
+        house2 = new CompositeObject(
+            new MapCell(6,4),
+            false,
+            false,
+            houseImage2,
+            3,
+            2
         ),
 
         units = [unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10, unit11, unit12, unit13],
@@ -362,7 +378,8 @@ function gameRoutine(){
         visibleObjects = [stone0, stone1, stone2, stone3, stone4, stone5,
             tree0, tree1, tree2, tree3, tree4, tree5],
 
-        gameObjectsPool = units.concat(gun0, gun1).concat(car0).concat(visibleObjects),
+        gameObjectsPool = units.concat(gun0, gun1).concat(car0).concat(visibleObjects).concat(house).concat(house.internalObjects)
+            .concat(house2).concat(house2.internalObjects),
 
         //gameObjectsPool = [unit0, unit8],
 
@@ -382,17 +399,19 @@ function gameRoutine(){
         unitTracker = new UnitTracker(gameObjectsPool, cellWidth, cellHeight),
         gameTimer = new GameTimer();
 
-    tankImage1.src = 'Pz-3.png';
-    tankImage2.src = 't34-42.png';
-    tankImage3.src = 'Pz-5-Panther.png';
-    tankTurretImage1.src = 'Pz-3_turret.png';
-    tankTurretImage3.src = 'Pz-5-Panther_turret.png';
-    tankTurretImage4.src = 't34-42_turret.png';
-    stoneImage1.src = 'stone1.png';
-    treeImage1.src = 'spruce_tree1.png';
-    gunImage1.src = 'zis-3.png';
-    gunImage2.src = 'pak-40.png',
-    carImage1.src = 'car.png';
+    tankImage1.src = 'Pictures/Pz-3.png';
+    tankImage2.src = 'Pictures/t34-42.png';
+    tankImage3.src = 'Pictures/Pz-5-Panther.png';
+    tankTurretImage1.src = 'Pictures/Pz-3_turret.png';
+    tankTurretImage3.src = 'Pictures/Pz-5-Panther_turret.png';
+    tankTurretImage4.src = 'Pictures/t34-42_turret.png';
+    stoneImage1.src = 'Pictures/stone1.png';
+    treeImage1.src = 'Pictures/spruce_tree1.png';
+    gunImage1.src = 'Pictures/zis-3.png';
+    gunImage2.src = 'Pictures/pak-40.png',
+    carImage1.src = 'Pictures/car.png';
+    houseImage.src = 'Pictures/house_1.png';
+    houseImage2.src = 'Pictures/house_2.png';
 
     function getChar(event) {
         gameProperty.currentKey = event.which;
