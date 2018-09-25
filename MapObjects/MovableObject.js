@@ -49,8 +49,7 @@ function MovableObject(
     currentMapCell,
     isPassable,
     isGunShellPenetrable,
-    image,
-    relativeSize,
+    graphicObject,
     health,
     disappearanceAfterDeathCount,
     destinationMapCell,
@@ -65,11 +64,8 @@ function MovableObject(
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if (!(image instanceof Image))
-        throw TypeError("image isn't Image");
-
-    if ("number" != typeof relativeSize)
-        throw TypeError("relativeSize isn't number");
+    if (!(graphicObject instanceof GraphicObject))
+        throw TypeError("graphicObject isn't GraphicObject");
 
     if (!isInteger(health))
         throw TypeError("health isn't integer");
@@ -88,8 +84,7 @@ function MovableObject(
         currentMapCell,
         isPassable,
         isGunShellPenetrable,
-        image,
-        relativeSize,
+        graphicObject,
         health,
         disappearanceAfterDeathCount);
 

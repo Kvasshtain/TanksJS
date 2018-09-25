@@ -2,12 +2,11 @@ function DestroyableVisibleObject(
     currentMapCell,
     isPassable,
     isGunShellPenetrable,
-    image,
-    relativeSize,
+    graphicObject,
     health,
     disappearanceAfterDeathCount) {
 
-    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell !== undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -16,8 +15,8 @@ function DestroyableVisibleObject(
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if ("number" != typeof relativeSize)
-        throw TypeError("relativeSize isn't number");
+    if (!(graphicObject instanceof GraphicObject) && graphicObject !== undefined)
+        throw new TypeError("graphicObject isn't GraphicObject");
 
     if (!isInteger(health))
         throw TypeError("health isn't integer");
@@ -25,7 +24,7 @@ function DestroyableVisibleObject(
     if (!isInteger(disappearanceAfterDeathCount))
         throw TypeError("disappearanceAfterDeathCount isn't integer");
 
-    VisibleObject.call(this, currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize);
+    VisibleObject.call(this, currentMapCell, isPassable, isGunShellPenetrable, graphicObject);
 
     this.health = health;
     this.maxHealth = health;

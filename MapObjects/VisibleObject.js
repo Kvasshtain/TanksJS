@@ -1,6 +1,6 @@
-function VisibleObject(currentMapCell, isPassable, isGunShellPenetrable, image, relativeSize) {
+function VisibleObject(currentMapCell, isPassable, isGunShellPenetrable, graphicObject) {
 
-    if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
+    if (!(currentMapCell instanceof MapCell) && currentMapCell !== undefined)
         throw new TypeError("currentMapCell isn't MapCell");
 
     if ("boolean" != typeof isPassable)
@@ -9,13 +9,12 @@ function VisibleObject(currentMapCell, isPassable, isGunShellPenetrable, image, 
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if ("number" != typeof relativeSize)
-        throw TypeError("relativeSize isn't number");
+    if (!(graphicObject instanceof GraphicObject) && graphicObject !== undefined)
+        throw new TypeError("graphicObject isn't GraphicObject");
 
     GameObject.call(this, currentMapCell, isPassable, isGunShellPenetrable);
 
-    this.image = image;
-    this.relativeSize = relativeSize;
+    this.graphicObject = graphicObject;
 }
 
 VisibleObject.prototype = inherit(GameObject.prototype);

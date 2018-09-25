@@ -2,8 +2,7 @@ function ShootableObject(
     currentMapCell,
     isPassable,
     isGunShellPenetrable,
-    image,
-    relativeSize,
+    graphicObject,
     health,
     disappearanceAfterDeathCount,
     name,
@@ -11,8 +10,7 @@ function ShootableObject(
     fireRadius,
     damage,
     rechargeGunTime,
-    turretImage,
-    relativeTurretSize) {
+    turretGraphicObject) {
 
     if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
@@ -22,9 +20,6 @@ function ShootableObject(
 
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
-
-    if ("number" != typeof relativeSize)
-        throw TypeError("relativeSize isn't number");
 
     if (!isInteger(health))
         throw TypeError("health isn't integer");
@@ -41,19 +36,15 @@ function ShootableObject(
     if (!isInteger(rechargeGunTime))
         throw TypeError("rechargeGunTime isn't integer");
 
-    if (!(turretImage instanceof Image))
-        throw new TypeError("turretImage isn't Image");
-
-    if ("number" != typeof relativeTurretSize)
-        throw TypeError("relativeTurretSize isn't number");
+    if (!(turretGraphicObject instanceof GraphicObject))
+        throw new TypeError("turretGraphicObject isn't GraphicObject");
 
     DestroyableVisibleObject.call(
         this,
         currentMapCell,
         isPassable,
         isGunShellPenetrable,
-        image,
-        relativeSize,
+        graphicObject,
         health,
         disappearanceAfterDeathCount);
 
@@ -62,13 +53,12 @@ function ShootableObject(
     this.fireRadius = fireRadius;
     this.damage = damage;
     this.rechargeGunTime = rechargeGunTime;
-    this.turretImage = turretImage;
+    this.turretGraphicObject = turretGraphicObject;
     this.turretOrientation = 0;
     this.gunShellImage = new Image();
     this.gunShellImage.src = 'Pictures/redGunShell.png';
     this.targetIndex = undefined;
     this.rechargeGunTimer = this.rechargeGunTime;
-    this.relativeTurretSize = relativeTurretSize;
 }
 
 ShootableObject.prototype = inherit(DestroyableVisibleObject.prototype);

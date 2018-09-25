@@ -117,7 +117,8 @@ GameDrawer.prototype ={
             currentDirection,
             health,
             maxHealth,
-            visibleObject;
+            visibleObject,
+            relativeSize;
 
         if(!this.visibleObjects)
             return;
@@ -136,29 +137,21 @@ GameDrawer.prototype ={
                 visibleObject.renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
             }
 
-            if (visibleObject.relativeSize) {
-                width = this.cellWidth * visibleObject.relativeSize;
-                height = this.cellHeight * visibleObject.relativeSize;
-
-                xOffset = this.cellWidth / 2 - width / 2;
-                yOffset = this.cellHeight / 2 - height / 2;
-            }
-            else if (visibleObject instanceof CompositeObject) {
+            if (visibleObject instanceof CompositeObject) {
                 width = this.cellWidth * visibleObject.xSize;
                 height = this.cellHeight * visibleObject.ySize;
 
                 xOffset = 0;
                 yOffset = 0;
             }
-            else {
-                width = this.cellWidth;
-                height = this.cellHeight;
+            else if (visibleObject.graphicObject) {
+                relativeSize = visibleObject.graphicObject.relativeSize
+                width = this.cellWidth * relativeSize;
+                height = this.cellHeight * relativeSize;
 
-                xOffset = 0;
-                yOffset = 0;
+                xOffset = this.cellWidth / 2 - width / 2;
+                yOffset = this.cellHeight / 2 - height / 2;
             }
-
-
 
             cellX = visibleObject.renderingX;
             cellY = visibleObject.renderingY;
@@ -166,10 +159,10 @@ GameDrawer.prototype ={
             x = cellX + xOffset;
             y = cellY + yOffset;
 
-            if (visibleObject.image) {
+            if (visibleObject.graphicObject) {
                 currentDirection = visibleObject.currentDirection;
 
-                image = visibleObject.image;
+                image = visibleObject.graphicObject.image;
 
                 if (currentDirection) {
                     this._rotateAndDrawImage(image, x, y, width, height, currentDirection)
@@ -179,7 +172,7 @@ GameDrawer.prototype ={
                 }
             }
 
-            if (visibleObject.turretImage)
+            if (visibleObject.turretGraphicObject)
                 this._drawTurret(visibleObject);
 
             health = visibleObject.health;
@@ -227,7 +220,7 @@ GameDrawer.prototype ={
         if(!visibleObject)
             return;
 
-        if(!visibleObject.turretImage)
+        if(!visibleObject.turretGraphicObject)
             return;
 
         if(visibleObject.turretOrientation === undefined)
@@ -242,7 +235,8 @@ GameDrawer.prototype ={
             renderingX,
             renderingY,
             xOffset,
-            yOffset;
+            yOffset,
+            relativeTurretSize;
 
         if (!visibleObject.renderingX || !visibleObject.renderingY) {
             renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
@@ -253,9 +247,10 @@ GameDrawer.prototype ={
             renderingY = visibleObject.renderingY;
         }
 
-        if (visibleObject.relativeSize) {
-            width = this.cellWidth * visibleObject.relativeTurretSize;
-            height = this.cellHeight * visibleObject.relativeTurretSize;
+        if (visibleObject.graphicObject) {
+            relativeTurretSize = visibleObject.turretGraphicObject.relativeSize;
+            width = this.cellWidth * relativeTurretSize;
+            height = this.cellHeight * relativeTurretSize;
         }
         else {
             width = this.cellWidth;
@@ -269,7 +264,7 @@ GameDrawer.prototype ={
         y = renderingY + yOffset;
 
         orientation = visibleObject.turretOrientation;
-        image = visibleObject.turretImage;
+        image = visibleObject.turretGraphicObject.image;
 
         this._drawImageOnMap(x, y, width, height, orientation, image);
     },
@@ -341,7 +336,7 @@ GameDrawer.prototype ={
         for (var i = 0; i < this.gunShells.length; i++){
 
             gunShell = this.gunShells[i];
-            image = gunShell.image;
+            image = gunShell.graphicObject.image;
             x = gunShell.currentPoint.x + this.cellWidth / 2 - width / 2;
             y = gunShell.currentPoint.y + this.cellHeight / 2 - height / 2;
             if (!x || !y) {

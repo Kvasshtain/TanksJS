@@ -144,7 +144,7 @@ UnitStriker.prototype = {
             targetPoint = new Point(enemyObject.renderingX, enemyObject.renderingY),
             damage = shootableObject.damage,
             image = shootableObject.gunShellImage;
-        return new GunShell(shotPoint, targetPoint, damage, image, gunShellIndex);
+        return new GunShell(shotPoint, targetPoint, damage, new GraphicObject(image, 1, 0, 0), gunShellIndex);
     },
 
     _objectShot : function (shootableObject, enemyObject) {

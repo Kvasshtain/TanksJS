@@ -1,6 +1,6 @@
 function GraphicObject(image, relativeSize, shiftX, shiftY) {
     if (!(image instanceof Image))
-        throw TypeError("image isn't Image");
+        throw TypeError("graphicObject isn't Image");
 
     if ("number" != typeof relativeSize)
         throw TypeError("relativeSize isn't number");
