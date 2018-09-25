@@ -2,8 +2,7 @@ function ShootableMovableObject(
     currentMapCell,
     isPassable,
     isGunShellPenetrable,
-    image,
-    relativeSize,
+    graphicObject,
     health,
     disappearanceAfterDeathCount,
     name,
@@ -11,8 +10,7 @@ function ShootableMovableObject(
     fireRadius,
     damage,
     rechargeGunTime,
-    turretImage,
-    relativeTurretSize,
+    turretGraphicObject,
     destinationMapCell,
     currentDirection
 ) {
@@ -25,11 +23,8 @@ function ShootableMovableObject(
     if ("boolean" != typeof isGunShellPenetrable)
         throw new TypeError("isGunShellPenetrable isn't bool");
 
-    if (!(image instanceof Image))
-        throw TypeError("image isn't Image");
-
-    if ("number" != typeof relativeSize)
-        throw TypeError("relativeSize isn't number");
+    if (!(graphicObject instanceof GraphicObject))
+        throw TypeError("graphicObject isn't GraphicObject");
 
     if (!isInteger(health))
         throw TypeError("health isn't integer");
@@ -46,11 +41,8 @@ function ShootableMovableObject(
     if (!isInteger(rechargeGunTime))
         throw TypeError("rechargeGunTime isn't integer");
 
-    if (!(turretImage instanceof Image))
-        throw new TypeError("turretImage isn't Image");
-
-    if ("number" != typeof relativeTurretSize)
-        throw TypeError("relativeTurretSize isn't number");
+    if (!(turretGraphicObject instanceof GraphicObject))
+        throw new TypeError("turretGraphicObject isn't GraphicObject");
 
     if (!(destinationMapCell instanceof MapCell) && destinationMapCell != undefined)
         throw new TypeError("destinationMapCell is not MapCell or undefined");
@@ -63,8 +55,7 @@ function ShootableMovableObject(
         currentMapCell,
         isPassable,
         isGunShellPenetrable,
-        image,
-        relativeSize,
+        graphicObject,
         health,
         disappearanceAfterDeathCount,
         name,
@@ -72,16 +63,14 @@ function ShootableMovableObject(
         fireRadius,
         damage,
         rechargeGunTime,
-        turretImage,
-        relativeTurretSize);
+        turretGraphicObject);
 
     MovableObject.call(
         this,
         currentMapCell,
         isPassable,
         isGunShellPenetrable,
-        image,
-        relativeSize,
+        graphicObject,
         health,
         disappearanceAfterDeathCount,
         destinationMapCell,

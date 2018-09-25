@@ -1,4 +1,4 @@
-function CompositeObject(currentMapCell, isPassable, isGunShellPenetrable, image, xSize, ySize) {
+function CompositeObject(currentMapCell, isPassable, isGunShellPenetrable, graphicObject, xSize, ySize) {
 
     if (!(currentMapCell instanceof MapCell) && currentMapCell != undefined)
         throw new TypeError("currentMapCell isn't MapCell");
@@ -17,7 +17,7 @@ function CompositeObject(currentMapCell, isPassable, isGunShellPenetrable, image
 
     GameObject.call(this, currentMapCell, isPassable, isGunShellPenetrable);
 
-    this.image = image;
+    this.graphicObject = graphicObject;
     this.xSize = xSize;
     this.ySize = ySize;
 

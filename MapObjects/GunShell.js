@@ -1,4 +1,4 @@
-function GunShell(shotPoint, targetPoint, damage, image, gunShellIndex) {
+function GunShell(shotPoint, targetPoint, damage, graphicObject, gunShellIndex) {
     var xFlightDistance, yFlightDistance, xFlightDistancePow2, yFlightDistancePow2;
 
     if (!(shotPoint instanceof Point))
@@ -10,8 +10,8 @@ function GunShell(shotPoint, targetPoint, damage, image, gunShellIndex) {
     if ("number" != typeof(damage))
         throw TypeError("damage isn't number");
 
-    if (!(image instanceof Image))
-        throw TypeError("image isn't Image");
+    if (!(graphicObject instanceof GraphicObject))
+        throw TypeError("graphicObject isn't GraphicObject");
 
     if (!isInteger(gunShellIndex))
         throw TypeError("gunShellIndex isn't Integer")
@@ -27,7 +27,7 @@ function GunShell(shotPoint, targetPoint, damage, image, gunShellIndex) {
     yFlightDistancePow2 = yFlightDistance * yFlightDistance;
     this.flightDistance = Math.sqrt(xFlightDistancePow2 + yFlightDistancePow2);
     this.azimuth = Math.atan2(xFlightDistance, yFlightDistance);
-    this.image = image;
+    this.graphicObject = graphicObject;
     this.gunShellIndex = gunShellIndex;
 }
 

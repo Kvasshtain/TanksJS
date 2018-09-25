@@ -10,7 +10,7 @@ function Unit(name, currentMapCell, destinationMapCell, currentDirection, image,
         throw new TypeError("destinationMapCell is not MapCell or undefined");
 
     if (!(image instanceof Image))
-        throw TypeError("image is not Image");
+        throw TypeError("graphicObject is not Image");
 
     if (!isInteger(health))
         throw TypeError("health isn't integer")
@@ -23,7 +23,7 @@ function Unit(name, currentMapCell, destinationMapCell, currentDirection, image,
     this.nextMapCell = currentMapCell;
     this.destinationMapCell = destinationMapCell;
     this.currentDirection = currentDirection;
-    this.image = image;
+    this.graphicObject = image;
     this.gunShellImage = new Image();
     this.gunShellImage.src = 'Pictures/redGunShell.png';
     this.renderingX = undefined;
