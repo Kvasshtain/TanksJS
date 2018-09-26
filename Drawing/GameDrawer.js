@@ -132,8 +132,11 @@ GameDrawer.prototype ={
             if (!visibleObject.currentMapCell)
                 continue;
 
-            if (!visibleObject.renderingX || !visibleObject.renderingY) {
+            if (visibleObject.renderingX === undefined) {
                 visibleObject.renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
+            }
+
+            if (visibleObject.renderingY === undefined) {
                 visibleObject.renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
             }
 
@@ -238,7 +241,7 @@ GameDrawer.prototype ={
             yOffset,
             relativeTurretSize;
 
-        if (!visibleObject.renderingX || !visibleObject.renderingY) {
+        if (visibleObject.renderingX === undefined || visibleObject.renderingY === undefined) {
             renderingX = this.cellHeight * visibleObject.currentMapCell.xIndex;
             renderingY = this.cellWidth * visibleObject.currentMapCell.yIndex;
         }
