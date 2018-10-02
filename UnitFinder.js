@@ -45,6 +45,52 @@ UnitFinder.prototype = {
         return undefined;
     },
 
+    findCrossMovementUnit : function (currentMapCell, nextMapCell) {
+
+        if (currentMapCell === undefined)
+            return undefined;
+
+        if (nextMapCell === undefined)
+            return undefined;
+
+        if (!(currentMapCell instanceof MapCell))
+            throw TypeError("currentMapCell isn't MapCell");
+
+        if (!(nextMapCell instanceof MapCell))
+            throw TypeError("nextMapCell isn't MapCell");
+
+        for (var unitIndex = 0; unitIndex < this.findableObjects.length; unitIndex++){
+
+            if (this.findableObjects[unitIndex].currentMapCell === undefined)
+                continue;
+
+            if (this.findableObjects[unitIndex].nextMapCell === undefined)
+                continue;
+
+            if ((this.findableObjects[unitIndex].currentMapCell.xIndex == nextMapCell.xIndex)
+                &&
+                (this.findableObjects[unitIndex].nextMapCell.yIndex == nextMapCell.yIndex)
+                &&
+                (this.findableObjects[unitIndex].currentMapCell.yIndex == currentMapCell.yIndex)
+                &&
+                (this.findableObjects[unitIndex].nextMapCell.xIndex == currentMapCell.xIndex)) {
+                return unitIndex;
+            }
+
+            if ((this.findableObjects[unitIndex].currentMapCell.yIndex == nextMapCell.yIndex)
+                &&
+                (this.findableObjects[unitIndex].nextMapCell.xIndex == nextMapCell.xIndex)
+                &&
+                (this.findableObjects[unitIndex].currentMapCell.xIndex == currentMapCell.xIndex)
+                &&
+                (this.findableObjects[unitIndex].nextMapCell.yIndex == currentMapCell.yIndex)) {
+                return unitIndex;
+            }
+        }
+
+        return undefined;
+    },
+
     _isObjectUnit : function (mapObject) {
         return (mapObject instanceof MovableObject
                 ||

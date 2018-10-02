@@ -61,7 +61,7 @@ UnitsMover.prototype = {
             }
 
             if (unit.movementPath != undefined) {
-                this._turnAndMoveUnit(unit, unit.movementPath[unit.movementPathStepIndex]);
+                this._turnAndMoveUnit(unit);
                 if (unit.movementPathStepIndex < unit.movementPath.length - 1) {
                     unit.movementPathStepIndex++;
                 }
@@ -69,7 +69,10 @@ UnitsMover.prototype = {
         }
     },
 
-    _turnAndMoveUnit : function(unit, nextCell) {
+    _turnAndMoveUnit : function(unit) {
+
+        var nextCell = unit.movementPath[unit.movementPathStepIndex],
+            currentCell = unit.currentMapCell;
 
         if (MapCell.areEqual(nextCell, unit.destinationMapCell)
             &&
@@ -84,6 +87,10 @@ UnitsMover.prototype = {
             unit.movementPath = this.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
             unit.movementPathStepIndex = 1;
             nextCell = unit.movementPath[unit.movementPathStepIndex];
+        }
+
+        if (this.unitFinder.findCrossMovementUnit(currentCell, nextCell) !== undefined) {
+            return;
         }
 
         unit.currentDirection = unit.currentMapCell.identifyDirectionToNextCell(nextCell);
