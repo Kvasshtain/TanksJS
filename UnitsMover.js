@@ -36,18 +36,21 @@ UnitsMover.prototype = {
     constructor : UnitsMover,
 
     moveUnits : function () {
+
         var length = this.movableObjects.length;
 
         for (var unitIndex = 0; unitIndex < length; unitIndex++) {
-            var unit = this.movableObjects[unitIndex];
+            var unit = this.movableObjects[unitIndex],
+                obstacleIndex;
 
             if (!(unit instanceof MovableObject))
                 continue;
 
-            if (unit.health <= 0)
-                continue;
+            obstacleIndex = this.mapObjectFinder.findByMapCellObjIndex(unit.nextMapCell, unitIndex);
 
-            if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
+            if (obstacleIndex !== undefined){
+                unit.nextMapCell = unit.currentMapCell;
+                unit.stop();
                 continue;
             }
 
@@ -56,35 +59,44 @@ UnitsMover.prototype = {
                 continue;
             }
 
-            if (unit.isStopForShot) {
+            if (unit.health <= 0)
+                continue;
+
+            if (MapCell.areEqual(unit.currentMapCell, unit.destinationMapCell)) {
+                unit.nextMapCell = unit.currentMapCell;
+                unit.stop();
+                unit.movementPathStepIndex = 0;
                 continue;
             }
 
-            if (unit.movementPath != undefined) {
-                this._turnAndMoveUnit(unit);
-                if (unit.movementPathStepIndex < unit.movementPath.length - 1) {
-                    unit.movementPathStepIndex++;
-                }
+            if (unit.movementPath === undefined) {
+                continue;
             }
+
+            this._turnAndMoveUnit(unit);
         }
     },
 
     _turnAndMoveUnit : function(unit) {
 
         var nextCell = unit.movementPath[unit.movementPathStepIndex],
-            currentCell = unit.currentMapCell;
+            currentCell = unit.currentMapCell,
+            destinationMapCell = unit.destinationMapCell;
 
-        if (MapCell.areEqual(nextCell, unit.destinationMapCell)
+        if (MapCell.areEqual(currentCell, destinationMapCell)) {
+            unit.stop();
+            return;
+        }
+
+        if (MapCell.areEqual(nextCell, destinationMapCell)
             &&
             (this.unitFinder.findByMapCellObjIndex(nextCell) !== undefined)) {
-            unit.destinationMapCell = unit.currentMapCell;
-            unit.nextMapCell = unit.currentMapCell;
-            unit.movementPathStepIndex = 0;
+            unit.stop();
             return;
         }
 
         if (this.unitFinder.findByMapCellObjIndex(nextCell) !== undefined) {
-            unit.movementPath = this.pathFinder.findPath(unit.currentMapCell, unit.destinationMapCell);
+            unit.movementPath = this.pathFinder.findPath(unit.currentMapCell, destinationMapCell);
             unit.movementPathStepIndex = 1;
             nextCell = unit.movementPath[unit.movementPathStepIndex];
         }
@@ -98,6 +110,10 @@ UnitsMover.prototype = {
         unit.turretOrientation = direction.defineOrientationFromDirection(unit.currentDirection);
 
         unit.nextMapCell = nextCell;
+
+        if ((unit.movementPathStepIndex < unit.movementPath.length - 1)){
+            unit.movementPathStepIndex++;
+        }
     },
 
     _moveUnitsBetweenCells : function (i) {

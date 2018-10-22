@@ -177,6 +177,22 @@ PathFinder.prototype = {
         return way;
     },
 
+    needFindPath : function (movableObject) {
+        if (!(movableObject instanceof MovableObject)) {
+            return false;
+        }
+
+        if (MapCell.areEqual(movableObject.currentMapCell, movableObject.destinationMapCell)) {
+            return false;
+        }
+
+        if (movableObject.movementPath !== undefined) {
+            return false;
+        }
+
+        return true;
+    },
+
     findPath : function (startCell, destinationCell) {
 
         if (!(startCell instanceof MapCell))

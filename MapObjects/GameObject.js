@@ -25,10 +25,10 @@ GameObject.CalculateDistance = function (gameObject1, gameObject2, cellHeight, c
     var xDistance,
         yDistance;
 
-    if (!(gameObject1 instanceof Unit) && !(gameObject1 instanceof GameObject))
+    if (!(gameObject1 instanceof GameObject) && !(gameObject1 instanceof GameObject))
         throw TypeError("gameObject1 is not GameObject");
 
-    if (!(gameObject2 instanceof Unit) && !(gameObject2 instanceof GameObject))
+    if (!(gameObject2 instanceof GameObject) && !(gameObject2 instanceof GameObject))
         throw TypeError("gameObject2 is not GameObject");
 
     if (cellWidth === undefined)

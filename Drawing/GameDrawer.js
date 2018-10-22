@@ -79,20 +79,25 @@ GameDrawer.prototype ={
     drawMap: function () {
 
         var width = this.cellWidth,
-            height = this.cellHeight;
+            height = this.cellHeight,
+            x,
+            y;
 
         for(var i = 0; i < this.battleMap.rowNum; i++) {
             for (var j = 0; j < this.battleMap.columnNum; j++) {
 
                 y = this.cellHeight * i;
                 x = this.cellWidth * j;
-                this.drawArea.fillStyle = "black";
-                this.drawArea.fillRect(x, y, width, height);
+                //this.drawArea.fillStyle = "black";
+                //this.drawArea.fillRect(x, y, width, height);
+
+                // this.drawArea.fillStyle = "green";
+                // this.drawArea.fillRect(x + 1, y + 1, width - 2, height - 2);
+
+                //this._drawCellCoordinates(x + width/3, y + height/2, j + ':' + i);
 
                 this.drawArea.fillStyle = "green";
-                this.drawArea.fillRect(x + 1, y + 1, width - 2, height - 2);
-
-                this._drawCellCoordinates(x + width/3, y + height/2, j + ':' + i);
+                this.drawArea.fillRect(x, y, width, height);
             }
         }
     },

@@ -98,6 +98,12 @@ function MovableObject(
 }
 
 MovableObject.prototype = inherit(DestroyableVisibleObject.prototype);
+MovableObject.prototype.stop = function () {
+
+    this.destinationMapCell = this.nextMapCell;// = this.currentMapCell;
+    this.movementPath = undefined;
+    this.movementPathStepIndex = 0;
+};
 MovableObject.prototype.constructor = MovableObject;
 
 MovableObject.Stop = function (movableObject) {
@@ -105,7 +111,7 @@ MovableObject.Stop = function (movableObject) {
     if (!(movableObject instanceof MovableObject))
         throw TypeError("movableObject isn't MovableObject");
 
-    movableObject.destinationMapCell = movableObject.nextMapCell = movableObject.currentMapCell;
+    movableObject.destinationMapCell = movableObject.nextMapCell;// = movableObject.currentMapCell;
     movableObject.movementPath = undefined;
     movableObject.movementPathStepIndex = 0;
     return;

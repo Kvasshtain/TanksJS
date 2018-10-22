@@ -37,7 +37,7 @@ UnitTracker.prototype = {
         for (var i = 0; i < this.shootableObjects.length; i++) {
             unit = this.shootableObjects[i];
 
-            if (!unit.targetIndex) {
+            if (unit.targetIndex === undefined) {
                 continue;
             }
 
@@ -55,7 +55,7 @@ UnitTracker.prototype = {
 
             distance = GameObject.CalculateDistance(unit, targetUnit, this.cellHeight, this.cellWidth);
 
-            if ((targetUnit.team != unit.team)
+            if ((targetUnit.team !== unit.team)
              && (distance < unit.fireRadius)) {
                 continue;
             }

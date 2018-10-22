@@ -28,12 +28,21 @@ function UnitFinder(findableObjects, cellWidth, cellHeight){
 UnitFinder.prototype = {
     constructor : UnitFinder,
 
-    findByMapCellObjIndex : function (mapCell) {
+    findByMapCellObjIndex : function (mapCell, myOwnIndex) {
+
+        if (mapCell === undefined)
+            return undefined;
 
         if (!(mapCell instanceof MapCell))
-            throw TypeError("This is not MapCell");
+            throw TypeError("mapCell isn't MapCell");
+
+        if (!isInteger(myOwnIndex) && myOwnIndex !== undefined)
+            throw TypeError("myOwnIndex isn't index or undefined");
 
         for (var unitIndex = 0; unitIndex < this.findableObjects.length; unitIndex++){
+
+            if (unitIndex === myOwnIndex)
+                continue;
 
             if (MapCell.areEqual(this.findableObjects[unitIndex].currentMapCell, mapCell)
                 ||

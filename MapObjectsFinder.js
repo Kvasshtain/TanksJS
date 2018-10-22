@@ -36,16 +36,25 @@ MapObjectFinder.prototype = {
                 mapObject.currentMapCell)
     },
 
-    findByMapCellObjIndex : function (mapCell) {
+    findByMapCellObjIndex : function (mapCell, myOwnIndex) {
 
         var mapObject,
             currentMapCell,
             nextMapCell;
 
+        if (mapCell === undefined)
+            return undefined;
+
         if (!(mapCell instanceof MapCell))
-            throw TypeError("This is not MapCell");
+            throw TypeError("mapCell isn't MapCell");
+
+        if (!isInteger(myOwnIndex) && myOwnIndex !== undefined)
+            throw TypeError("myOwnIndex isn't index or undefined");
 
         for (var objectIndex = 0; objectIndex < this.gameObjects.length; objectIndex++){
+
+            if (objectIndex === myOwnIndex)
+                continue;
 
             mapObject = this.gameObjects[objectIndex];
             currentMapCell = mapObject.currentMapCell;

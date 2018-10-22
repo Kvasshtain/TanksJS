@@ -79,8 +79,4 @@ function ShootableMovableObject(
 
 ShootableMovableObject.prototype = inherit(MovableObject.prototype);
 ShootableMovableObject.prototype.constructor = ShootableMovableObject;
-ShootableMovableObject.prototype.stop = function () {
-    this.destinationMapCell = this.nextMapCell;
-    this.movementPath = undefined;
-    this.movementPathStepIndex = 0;
-};
+ShootableMovableObject.prototype.targetIndex = undefined;

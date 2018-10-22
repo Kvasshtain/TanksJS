@@ -18,7 +18,7 @@ function findPathForAllMovableObjects(movableObjects, pathFinder) {
             continue;
         }
 
-        if (!MapCell.areEqual(movableObject.currentMapCell, movableObject.destinationMapCell)) {
+        if (pathFinder.needFindPath(movableObject)) {
             movableObject.movementPath = pathFinder.findPath(movableObject.nextMapCell, movableObject.destinationMapCell);
             movableObject.movementPathStepIndex = 1;
         }
@@ -74,8 +74,6 @@ function gameRoutine(){
             new GraphicObject(tankTurretImage1, 1.3, 0, 0),
             new MapCell(1, 2),
             "down"),
-
-        unit2 = new Unit("pz3", new MapCell(3, 1), new MapCell(3, 1), "down", tankImage1, "панцерваффе", 40, 500),
 
         unit2 = new ShootableMovableObject(
             new MapCell(3, 1),
@@ -350,7 +348,9 @@ function gameRoutine(){
         gameObjectsPool = units.concat(gun0, gun1).concat(car0).concat(visibleObjects).concat(house).concat(house.internalObjects)
             .concat(house2).concat(house2.internalObjects),
 
-        //gameObjectsPool = [unit0, unit1],
+        //gameObjectsPool = [unit0, unit2],
+
+        //gameObjectsPool = [unit0],
 
         gunShells = [],
         cellWidth = 50,
