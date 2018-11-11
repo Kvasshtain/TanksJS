@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="controls/styles/gameMenu.css">
+    <title>Tank squall</title>
     <script src="PathFinder.js" defer></script>
     <script src="Helpers.js" defer></script>
     <script src="PriorityQueue.js" defer></script>
@@ -27,11 +30,17 @@
     <script src="UnitTracker.js" defer></script>
     <script src="UnitStriker.js" defer></script>
     <script src="GameTimer.js" defer></script>
+    <script src="UserInterface/UserMenu/GameMenu.js" defer></script>
     <script src="tanks.js" defer></script>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
-
+    <div class = 'gameMenu'>
+        <input id = "Move" class = "button" type = "button" value = Move! readonly = "true">
+        <input id = "Attack" class = "button" type = "button" value = Attack! readonly = "true">
+        <input id = "Stop" class = "button" type = "button" value = Stop! readonly = "true">
+        <input id = "Turn" class = "button" type = "button" value = Turn! readonly = "true">
+    </div>
 </body>
 </html>

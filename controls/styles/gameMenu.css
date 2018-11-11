@@ -1,0 +1,27 @@
+.gameMenu {
+    background: darkolivegreen;
+    border: 2px outset yellowgreen;
+    height: 100px;
+    width: 412px;
+    position: fixed;
+    left: 50%;
+    bottom: 0px;
+    border-radius: 10px 10px 0px 0px;
+    transform: translate(-50%, 0%);
+    z-index: 9001;
+}
+
+.button {
+    color: white;
+    background: darkolivegreen;
+    border: 2px outset yellowgreen;
+    font: bold 10pt/10pt sans-serif;
+    height: 90px;
+    width: 90px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.button:active {
+    border: 2px inset yellowgreen;
+}

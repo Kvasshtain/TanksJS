@@ -18,6 +18,7 @@ function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, lef
     if (gamerTeam === undefined)
         throw TypeError("gamerTeam is undefined");
 
+    this.currentGameMenuClickedButton = null;
     this.currentKey = currentKey;
     this.leftButtonSelectedCell = leftButtonSelectedCell;
     this.rightButtonSelectedCell = rightButtonSelectedCell;
@@ -30,5 +31,12 @@ function GameProperty(currentKey, selectedUnitIndex, mapObjects, unitFinder, lef
 
 GameProperty.prototype = {
     constructor : GameProperty,
-    currentHighlightedUnitIndex : undefined
+
+    currentHighlightedUnitIndex : undefined,
+
+    unitStop : function () {
+        var unit = this.mapObjects[this.selectedUnitIndex];
+        MovableObject.Stop(unit);
+        unit.targetIndex = undefined;
+    }
 }

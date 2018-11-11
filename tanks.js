@@ -355,8 +355,8 @@ function gameRoutine(){
         gunShells = [],
         cellWidth = 50,
         cellHeight = 50,
-        columnNum = 20,
-        rowNum = 20,
+        columnNum = 30,
+        rowNum = 30,
         battleMap = new BattleMap(columnNum, rowNum),
         unitFinder = new UnitFinder(gameObjectsPool, cellWidth, cellHeight),
         mapObjectFinder = new MapObjectFinder(gameObjectsPool, cellWidth, cellHeight),
@@ -366,7 +366,8 @@ function gameRoutine(){
         gameDrawer = new GameDrawer(cellWidth, cellHeight, battleMap, gunShells, gameObjectsPool, gameProperty),
         unitStriker = new UnitStriker(gameObjectsPool, gunShells, unitFinder, mapObjectFinder, cellWidth, cellHeight),
         unitTracker = new UnitTracker(gameObjectsPool, cellWidth, cellHeight),
-        gameTimer = new GameTimer();
+        gameTimer = new GameTimer(),
+        gameMenu = new GameMenu(gameProperty);
 
     tankImage1.src = 'Pictures/Pz-3.png';
     tankImage2.src = 'Pictures/t34-42.png';
@@ -413,6 +414,8 @@ function gameRoutine(){
     }
 
     gameDrawer.canvas.onclick = gameClickHandler;
+
+    gameMenu.bindEvents();
 
     function updateGame() {
         gameTimer.countUp();
